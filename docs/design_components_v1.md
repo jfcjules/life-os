@@ -23,8 +23,9 @@ Current local app behavior:
 
 ```text
 Life OS shell
-  -> Sidebar with all MVP navigation
-  -> Empty Home content area
+  -> Sidebar with all MVP navigation on desktop
+  -> Compact horizontal navigation on mobile/tablet
+  -> Empty content area for every core route
 ```
 
 The previously explored Home widgets and Quick Add flow are now reusable components, not committed product content.
@@ -61,11 +62,12 @@ Role:
 
 - Provides the main desktop app frame.
 - Mounts the sidebar.
+- Mounts compact mobile navigation.
 - Provides the main content slot.
 
 Current usage:
 
-- Rendered by `src/app/page.tsx`.
+- Rendered by every empty workspace route.
 
 ## 4.2 Sidebar
 
@@ -80,6 +82,7 @@ Role:
 - Displays product identity.
 - Displays Personal / Couple switch.
 - Displays primary MVP navigation.
+- Uses real routes instead of placeholder links.
 
 Current nav items:
 
@@ -167,6 +170,20 @@ Status:
 - Implemented as reusable design components.
 - Not rendered on the empty Home screen until product behavior is confirmed.
 
+## 4.8 EmptyWorkspace
+
+File:
+
+```text
+src/components/design-system/empty-workspace.tsx
+```
+
+Role:
+
+- Provides the empty route screen used by Home and core tool pages.
+- Keeps the local app navigable without adding simulated product data.
+- Gives each route a consistent title and empty panel while LOS-7 defines tool content.
+
 ---
 
 # 5. Tokens
@@ -211,7 +228,7 @@ The previous Home and Quick Add visual work has been extracted into reusable com
 Future work from LOS-7 can import from:
 
 ```ts
-import { AppShell, Panel, Card, Button } from "@/components/design-system";
+import { AppShell, EmptyWorkspace, Panel, Card, Button } from "@/components/design-system";
 ```
 
 ---
@@ -219,7 +236,5 @@ import { AppShell, Panel, Card, Button } from "@/components/design-system";
 # 7. Open Follow-Ups
 
 - Replace temporary text markers with a proper icon system.
-- Decide how mobile navigation should work.
 - Define true content models for each MVP tool after LOS-7 review.
-- Add route-level pages for each sidebar item once content is defined.
 - Decide whether Quick Add stays global or becomes contextual per tool.

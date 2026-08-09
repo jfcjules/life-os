@@ -1,13 +1,14 @@
+import Link from "next/link";
 import type { NavigationItem } from "./types";
 
 export const primaryNavigation: NavigationItem[] = [
   { label: "Home", href: "/" },
-  { label: "Calendar", href: "#" },
-  { label: "Reminders", href: "#" },
-  { label: "Finance", href: "#" },
-  { label: "Groceries", href: "#" },
-  { label: "Chores", href: "#" },
-  { label: "Settings", href: "#" },
+  { label: "Calendar", href: "/calendar" },
+  { label: "Reminders", href: "/reminders" },
+  { label: "Finance", href: "/finance" },
+  { label: "Groceries", href: "/groceries" },
+  { label: "Chores", href: "/chores" },
+  { label: "Settings", href: "/settings" },
 ];
 
 export function Sidebar({
@@ -52,7 +53,7 @@ export function Sidebar({
             const isActive = item.label === activeItem;
 
             return (
-              <a
+              <Link
                 key={item.label}
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
@@ -64,7 +65,7 @@ export function Sidebar({
               >
                 <span>{item.label}</span>
                 {isActive ? <span aria-hidden="true">.</span> : null}
-              </a>
+              </Link>
             );
           })}
         </nav>

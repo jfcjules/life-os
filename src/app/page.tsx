@@ -1,0 +1,24 @@
+import { AppShell, Panel } from "@/components/design-system";
+
+export default function Home() {
+  return (
+    <AppShell activeItem="Home">
+      <div className="flex min-h-full flex-col">
+        <header className="flex items-start justify-between gap-6 max-md:flex-col">
+          <div>
+            <p className="text-[12px] leading-5 text-[var(--text-muted)]">
+              Life OS
+            </p>
+            <h1 className="mt-3 text-[clamp(2.75rem,7vw,5.75rem)] font-medium leading-[0.96] text-[var(--text-primary)]">
+              Home
+            </h1>
+          </div>
+        </header>
+
+        <Panel className="mt-9 grid min-h-[520px] place-items-center">
+          <div className="size-3 rounded-full bg-[var(--color-action-secondary)]" />
+        </Panel>
+      </div>
+    </AppShell>
+  );
+}

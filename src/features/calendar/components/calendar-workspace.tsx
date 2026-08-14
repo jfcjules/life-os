@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { AppShell, Button, Card } from "@/components/design-system";
 
@@ -9,25 +9,30 @@ import {
   createSeedEvents,
   createWeekPreview,
 } from "../data";
-import type { CalendarSpaceFilter } from "../types";
+import type { CalendarEvent, CalendarSpaceFilter } from "../types";
 import {
   formatDisplayDate,
   isSameDay,
   sortEventsByStart,
 } from "../utils";
 import { CalendarSpaceFilter as CalendarSpaceFilterControl } from "./calendar-space-filter";
+import { CalendarEventForm } from "./calendar-event-form";
 import { CalendarTimeline } from "./calendar-timeline";
 import { CalendarViewToggle } from "./calendar-view-toggle";
 import { ConceptScopePanel } from "./concept-scope-panel";
 import { ConnectedItemsPanel } from "./connected-items-panel";
 import { WeekPreview } from "./week-preview";
 
+const calendarStorageKey = "life-os.calendar.events";
+
 export function CalendarWorkspace() {
   const today = useMemo(() => new Date(), []);
   const [selectedSpace, setSelectedSpace] =
     useState<CalendarSpaceFilter>("All");
+  const [isAddEventOpen, setIsAddEventOpen] = useState(false);
+  const [hasLoadedStoredEvents, setHasLoadedStoredEvents] = useState(false);
+  const [events, setEvents] = useState(() => createSeedEvents(today));
 
-  const events = useMemo(() => createSeedEvents(today), [today]);
   const todayEvents = useMemo(() => {
     const eventsForToday = events.filter((event) =>
       isSameDay(event.startsAt, today),
@@ -40,6 +45,37 @@ export function CalendarWorkspace() {
 
     return sortEventsByStart(eventsForSpace);
   }, [events, selectedSpace, today]);
+
+  useEffect(() => {
+    try {
+      const savedEvents = window.localStorage.getItem(calendarStorageKey);
+
+      if (savedEvents) {
+        const parsedEvents: unknown = JSON.parse(savedEvents);
+
+        if (Array.isArray(parsedEvents)) {
+          window.queueMicrotask(() => setEvents(parsedEvents));
+        }
+      }
+    } catch {
+      window.localStorage.removeItem(calendarStorageKey);
+    }
+
+    window.queueMicrotask(() => setHasLoadedStoredEvents(true));
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedStoredEvents) {
+      return;
+    }
+
+    window.localStorage.setItem(calendarStorageKey, JSON.stringify(events));
+  }, [events, hasLoadedStoredEvents]);
+
+  function handleCreateEvent(event: CalendarEvent) {
+    setEvents((currentEvents) => sortEventsByStart([...currentEvents, event]));
+    setIsAddEventOpen(false);
+  }
 
   return (
     <AppShell activeItem="Calendar">
@@ -58,8 +94,10 @@ export function CalendarWorkspace() {
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-3 max-md:justify-start">
-            <Button variant="ghost">Today</Button>
-            <Button>Add event</Button>
+            <Button variant="ghost" onClick={() => setSelectedSpace("All")}>
+              Today
+            </Button>
+            <Button onClick={() => setIsAddEventOpen(true)}>Add event</Button>
           </div>
         </header>
 
@@ -76,6 +114,7 @@ export function CalendarWorkspace() {
             <CalendarTimeline
               dateLabel={formatDisplayDate(today)}
               events={todayEvents}
+              onAddEvent={() => setIsAddEventOpen(true)}
             />
 
             <WeekPreview days={createWeekPreview(today)} />
@@ -94,7 +133,11 @@ export function CalendarWorkspace() {
                 and related reminders.
               </p>
               <div className="mt-5">
-                <Button variant="secondary" className="w-full">
+                <Button
+                  variant="secondary"
+                  className="w-full"
+                  onClick={() => setIsAddEventOpen(true)}
+                >
                   Add event
                 </Button>
               </div>
@@ -104,6 +147,13 @@ export function CalendarWorkspace() {
           </aside>
         </div>
       </div>
+      {isAddEventOpen ? (
+        <CalendarEventForm
+          today={today}
+          onCancel={() => setIsAddEventOpen(false)}
+          onCreateEvent={handleCreateEvent}
+        />
+      ) : null}
     </AppShell>
   );
 }

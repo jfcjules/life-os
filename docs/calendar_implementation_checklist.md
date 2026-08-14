@@ -9,9 +9,10 @@ Objetivo: convertir el mockup actual de Calendar en funcionalidades reales, trab
 - [x] Calendar MVP implementado con eventos de hoy, filtros por space, labels, modal de creacion local, persistencia en `localStorage` y connected items.
 - [x] Verificaciones locales completadas: `npm run lint`, `npm run build` y `GET /calendar` con status 200.
 - [x] Servidor local levantado en `http://localhost:3000/calendar`.
-- [ ] Push y PR pendientes hasta cerrar este documento y publicar la branch.
-- [ ] `AGENTS.md` queda fuera del scope de Calendar y no se incluye en los commits/PR.
-- [ ] US-03 y US-04 estan implementadas funcionalmente, pero no tienen commit propio separado; quedaron cubiertas por los commits de modelo, timeline y formulario.
+- [x] Branch publicada en GitHub.
+- [ ] PR pendiente de creacion.
+- Nota: `AGENTS.md` queda fuera del scope de Calendar y no se incluye en los commits/PR.
+- Nota: US-03 y US-04 estan implementadas funcionalmente, pero no tienen commit propio separado; quedaron cubiertas por los commits de modelo, timeline y formulario.
 
 ## 0. Punto de partida
 
@@ -56,7 +57,7 @@ git add .
 git commit -m "chore(calendar): capture calendar mockup and stories baseline"
 ```
 
-- [ ] Subir la branch si aplica:
+- [x] Subir la branch si aplica:
 
 ```bash
 git push
@@ -367,7 +368,7 @@ Antes de cerrar:
 - [x] Correr build.
 - [x] Revisar `git diff`.
 - [x] Commit.
-- [ ] Push si ya esta estable.
+- [x] Push si ya esta estable.
 - [x] Anotar siguiente paso.
 
 ## 15. Primer bloque recomendado para manana

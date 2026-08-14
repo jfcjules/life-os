@@ -46,6 +46,18 @@ export function CalendarWorkspace() {
     return sortEventsByStart(eventsForSpace);
   }, [events, selectedSpace, today]);
 
+  const connectedItemsForVisibleEvents = useMemo(() => {
+    const visibleEventIds = new Set(todayEvents.map((event) => event.id));
+
+    return connectedItems.filter((item) => {
+      const matchesVisibleEvent = visibleEventIds.has(item.eventId);
+      const matchesSpace =
+        selectedSpace === "All" || item.space === selectedSpace;
+
+      return matchesVisibleEvent && matchesSpace;
+    });
+  }, [selectedSpace, todayEvents]);
+
   useEffect(() => {
     try {
       const savedEvents = window.localStorage.getItem(calendarStorageKey);
@@ -121,7 +133,7 @@ export function CalendarWorkspace() {
           </div>
 
           <aside className="min-w-0 space-y-6">
-            <ConnectedItemsPanel items={connectedItems} />
+            <ConnectedItemsPanel items={connectedItemsForVisibleEvents} />
 
             <Card>
               <p className="text-[12px] font-medium leading-5">Empty state</p>

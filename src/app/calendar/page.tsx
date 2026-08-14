@@ -1,5 +1,5 @@
-import { EmptyWorkspace } from "@/components/design-system";
+import { CalendarWorkspace } from "@/features/calendar/components/calendar-workspace";
 
 export default function CalendarPage() {
-  return <EmptyWorkspace title="Calendar" />;
+  return <CalendarWorkspace />;
 }

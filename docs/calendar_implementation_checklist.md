@@ -12,7 +12,7 @@ Objetivo: convertir el mockup actual de Calendar en funcionalidades reales, trab
 - [x] Branch publicada en GitHub.
 - [x] PR draft creado: https://github.com/jfcjules/life-os/pull/3
 - Nota: `AGENTS.md` queda fuera del scope de Calendar y no se incluye en los commits/PR.
-- Nota: US-03 y US-04 estan implementadas funcionalmente, pero no tienen commit propio separado; quedaron cubiertas por los commits de modelo, timeline y formulario.
+- Nota: US-03, US-04 y persistencia MVP estan implementadas funcionalmente y trazadas en commits vecinos de Calendar aunque no usaron exactamente los mensajes sugeridos.
 
 ## 0. Punto de partida
 
@@ -215,7 +215,9 @@ npm run lint
 npm run build
 ```
 
-- [ ] Commit:
+- [x] Commit:
+
+Nota: cubierto por los commits `feat(calendar): show todays events`, `feat(calendar): filter events by space` y `feat(calendar): create local events`.
 
 ```bash
 git add .
@@ -240,7 +242,9 @@ npm run lint
 npm run build
 ```
 
-- [ ] Commit:
+- [x] Commit:
+
+Nota: cubierto por los commits `feat(calendar): show todays events` y `feat(calendar): create local events`.
 
 ```bash
 git add .
@@ -301,7 +305,9 @@ npm run lint
 npm run build
 ```
 
-- [ ] Commit:
+- [x] Commit:
+
+Nota: cubierto dentro del commit `feat(calendar): create local events`.
 
 ```bash
 git add .

@@ -10,7 +10,7 @@ Objetivo: convertir el mockup actual de Calendar en funcionalidades reales, trab
 - [x] Verificaciones locales completadas: `npm run lint`, `npm run build` y `GET /calendar` con status 200.
 - [x] Servidor local levantado en `http://localhost:3000/calendar`.
 - [x] Branch publicada en GitHub.
-- [ ] PR pendiente de creacion.
+- [x] PR draft creado: https://github.com/jfcjules/life-os/pull/3
 - Nota: `AGENTS.md` queda fuera del scope de Calendar y no se incluye en los commits/PR.
 - Nota: US-03 y US-04 estan implementadas funcionalmente, pero no tienen commit propio separado; quedaron cubiertas por los commits de modelo, timeline y formulario.
 

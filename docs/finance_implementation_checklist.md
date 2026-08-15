@@ -6,32 +6,32 @@ Objetivo: convertir las user stories de Finance en funcionalidades reales, traba
 
 ## 0. Punto de partida
 
-- [ ] Confirmar branch activa:
+- [x] Confirmar branch activa:
 
 ```bash
 git branch --show-current
 ```
 
-- [ ] Revisar estado del repo:
+- [x] Revisar estado del repo:
 
 ```bash
 git status
 ```
 
-- [ ] Confirmar que `src/app/finance/page.tsx` sigue como placeholder o mockup base.
-- [ ] Leer el indice de historias:
+- [x] Confirmar que `src/app/finance/page.tsx` renderiza `FinanceWorkspace`.
+- [x] Leer el indice de historias:
 
 ```text
 docs/user_stories/finance/README.md
 ```
 
-- [ ] Leer la estructura tecnica recomendada:
+- [x] Leer la estructura tecnica recomendada:
 
 ```text
 docs/finance_implementation_structure.md
 ```
 
-- [ ] Correr verificacion base antes de tocar Finance:
+- [x] Correr verificacion base antes de tocar Finance:
 
 ```bash
 npm run lint
@@ -40,13 +40,13 @@ npm run build
 
 ## 1. Crear branch de trabajo
 
-- [ ] Crear branch para el primer bloque:
+- [x] Crear branch para el primer bloque:
 
 ```bash
 git switch -c codex/finance-us-01-add-expense
 ```
 
-- [ ] Confirmar branch:
+- [x] Confirmar branch:
 
 ```bash
 git branch --show-current
@@ -54,13 +54,13 @@ git branch --show-current
 
 ## 2. Preparar estructura base de Finance
 
-- [ ] Crear carpeta de feature:
+- [x] Crear carpeta de feature:
 
 ```text
 src/features/finance/
 ```
 
-- [ ] Crear archivos base:
+- [x] Crear archivos base:
 
 ```text
 src/features/finance/types.ts
@@ -69,126 +69,126 @@ src/features/finance/utils.ts
 src/features/finance/storage.ts
 ```
 
-- [ ] Crear carpeta de componentes:
+- [x] Crear carpeta de componentes:
 
 ```text
 src/features/finance/components/
 ```
 
-- [ ] Crear componente principal:
+- [x] Crear componente principal:
 
 ```text
 src/features/finance/components/finance-workspace.tsx
 ```
 
-- [ ] Cambiar `src/app/finance/page.tsx` para renderizar solo `FinanceWorkspace`.
-- [ ] Mantener `page.tsx` como composicion de alto nivel, igual que Calendar.
+- [x] Cambiar `src/app/finance/page.tsx` para renderizar solo `FinanceWorkspace`.
+- [x] Mantener `page.tsx` como composicion de alto nivel, igual que Calendar.
 
 ## 3. Definir tipos MVP
 
-- [ ] Definir `FinanceSpace`:
-  - [ ] `Personal`
-  - [ ] `Couple`
+- [x] Definir `FinanceSpace`:
+  - [x] `Personal`
+  - [x] `Couple`
 
-- [ ] Definir `FinanceOwnershipFilter`:
-  - [ ] `All`
-  - [ ] `Personal`
-  - [ ] `Couple`
+- [x] Definir `FinanceOwnershipFilter`:
+  - [x] `All`
+  - [x] `Personal`
+  - [x] `Couple`
 
-- [ ] Definir `FinancePeriod`:
-  - [ ] `Weekly`
-  - [ ] `Biweekly`
-  - [ ] `Monthly`
+- [x] Definir `FinancePeriod`:
+  - [x] `Weekly`
+  - [x] `Biweekly`
+  - [x] `Monthly`
 
-- [ ] Definir `FinanceFrequency`:
-  - [ ] `One-time`
-  - [ ] `Weekly`
-  - [ ] `Monthly`
-  - [ ] `Yearly`
+- [x] Definir `FinanceFrequency`:
+  - [x] `One-time`
+  - [x] `Weekly`
+  - [x] `Monthly`
+  - [x] `Yearly`
 
-- [ ] Definir `FinanceUser`.
-- [ ] Definir `FinanceTag`.
-- [ ] Definir `Expense`.
-- [ ] Definir `Budget`.
-- [ ] Definir `Income`.
+- [x] Definir `FinanceUser`.
+- [x] Definir `FinanceTag`.
+- [x] Definir `Expense`.
+- [x] Definir `Budget`.
+- [x] Definir `Income`.
 
 Campos minimos de `Expense`:
 
-- [ ] `id`
-- [ ] `name`
-- [ ] `amount`
-- [ ] `date`
-- [ ] `ownership`
-- [ ] `category`
-- [ ] `assignedUserId`
-- [ ] `dueDate`
-- [ ] `frequency`
-- [ ] `tagIds`
+- [x] `id`
+- [x] `name`
+- [x] `amount`
+- [x] `date`
+- [x] `ownership`
+- [x] `category`
+- [x] `assignedUserId`
+- [x] `dueDate`
+- [x] `frequency`
+- [x] `tagIds`
 
 Campos minimos de `Budget`:
 
-- [ ] `id`
-- [ ] `name`
-- [ ] `amount`
-- [ ] `period`
-- [ ] `ownership`
-- [ ] `category`
-- [ ] `assignedUserId`
-- [ ] `dueDate`
-- [ ] `frequency`
-- [ ] `tagIds`
+- [x] `id`
+- [x] `name`
+- [x] `amount`
+- [x] `period`
+- [x] `ownership`
+- [x] `category`
+- [x] `assignedUserId`
+- [x] `dueDate`
+- [x] `frequency`
+- [x] `tagIds`
 
 Campos minimos de `Income`:
 
-- [ ] `id`
-- [ ] `name`
-- [ ] `amount`
-- [ ] `date`
-- [ ] `category`
-- [ ] `frequency`
-- [ ] `tagIds`
+- [x] `id`
+- [x] `name`
+- [x] `amount`
+- [x] `date`
+- [x] `category`
+- [x] `frequency`
+- [x] `tagIds`
 
 ## 4. Preparar data local y utilidades
 
-- [ ] Crear seed data temporal en `data.ts`:
-  - [ ] `createSeedExpenses(today)`
-  - [ ] `createSeedBudgets(today)`
-  - [ ] `createSeedIncome(today)`
-  - [ ] `seedFinanceUsers`
-  - [ ] `seedFinanceTags`
+- [x] Crear seed data temporal en `data.ts`:
+  - [x] `createSeedExpenses(today)`
+  - [x] `createSeedBudgets(today)`
+  - [x] `createSeedIncome(today)`
+  - [x] `seedFinanceUsers`
+  - [x] `seedFinanceTags`
 
-- [ ] Crear utilidades de formato:
-  - [ ] `formatCurrency(amount)`
-  - [ ] `formatDate(date)`
+- [x] Crear utilidades de formato:
+  - [x] `formatCurrency(amount)`
+  - [x] `formatDate(date)`
 
-- [ ] Crear utilidades de periodo:
-  - [ ] `getPeriodRange(period, anchorDate)`
-  - [ ] `movePeriod(period, anchorDate, direction)`
-  - [ ] `isWithinPeriod(date, range)`
-  - [ ] Weekly debe ser lunes a domingo.
-  - [ ] Biweekly debe ser periodo de 14 dias empezando lunes.
-  - [ ] Monthly debe ser mes calendario.
+- [x] Crear utilidades de periodo:
+  - [x] `getPeriodRange(period, anchorDate)`
+  - [x] `movePeriod(period, anchorDate, direction)`
+  - [x] `isWithinPeriod(date, range)`
+  - [x] Weekly debe ser lunes a domingo.
+  - [x] Biweekly debe ser periodo de 14 dias empezando lunes.
+  - [x] Monthly debe ser mes calendario.
 
-- [ ] Crear utilidades financieras:
-  - [ ] `sumExpenses(expenses)`
-  - [ ] `sumIncome(income)`
-  - [ ] `calculateNetSavings(incomeTotal, expenseTotal)`
-  - [ ] `getNextOccurrence(dueDate, frequency)`
+- [x] Crear utilidades financieras:
+  - [x] `sumExpenses(expenses)`
+  - [x] `sumIncome(income)`
+  - [x] `calculateNetSavings(incomeTotal, expenseTotal)`
+  - [x] `getNextOccurrence(dueDate, frequency)`
 
 ## 5. Preparar persistencia MVP
 
 Decision recomendada: React state + `localStorage`, igual que Calendar.
 
-- [ ] Crear `storage.ts`.
-- [ ] Definir keys de `localStorage`:
-  - [ ] expenses
-  - [ ] budgets
-  - [ ] income
-  - [ ] tags
+- [x] Crear `storage.ts`.
+- [x] Definir keys de `localStorage`:
+  - [x] expenses
+  - [x] budgets
+  - [x] income
+  - [x] tags
 
-- [ ] Crear helpers de lectura con fallback a seed data.
-- [ ] Crear helpers de escritura por entidad.
-- [ ] Evitar backend, auth, sync e integraciones en este bloque.
+- [x] Crear helpers de lectura con fallback a seed data.
+- [x] Crear helpers de escritura por entidad.
+- [x] Evitar backend, auth, sync e integraciones en este bloque.
 
 ## 6. Implementar US-01 - Add new expense
 
@@ -198,41 +198,41 @@ Archivo de referencia:
 docs/user_stories/finance/us-01-add-new-expense.md
 ```
 
-- [ ] Leer la historia completa y sus Acceptance Criteria.
-- [ ] Crear `ExpenseForm`.
-- [ ] Crear accion clara `Add expense` en Finance.
-- [ ] Abrir modal o panel al seleccionar `Add expense`.
-- [ ] Campos requeridos:
-  - [ ] Expense name
-  - [ ] Amount
-  - [ ] Date
+- [x] Leer la historia completa y sus Acceptance Criteria.
+- [x] Crear `ExpenseForm`.
+- [x] Crear accion clara `Add expense` en Finance.
+- [x] Abrir modal o panel al seleccionar `Add expense`.
+- [x] Campos requeridos:
+  - [x] Expense name
+  - [x] Amount
+  - [x] Date
 
-- [ ] Campos opcionales en este primer pase:
-  - [ ] Category
-  - [ ] Tags, si ya existe soporte simple
+- [x] Campos opcionales en este primer pase:
+  - [x] Category
+  - [x] Tags no se implementan hasta US-08.
 
-- [ ] Agregar acciones del modal:
-  - [ ] `Add expense`
-  - [ ] `Cancel`
+- [x] Agregar acciones del modal:
+  - [x] `Add expense`
+  - [x] `Cancel`
 
-- [ ] Validar campos requeridos.
-- [ ] Crear expense en estado local.
-- [ ] Guardar expense en `localStorage` si storage ya esta activo.
-- [ ] Limpiar formulario despues de guardar.
-- [ ] Cancelar debe cerrar y descartar datos.
-- [ ] Crear `ConfirmDeleteDialog`.
-- [ ] Permitir eliminar expense existente.
-- [ ] Pedir confirmacion antes de eliminar.
-- [ ] Confirmar que eliminar remueve el expense del contexto correspondiente.
-- [ ] Confirmar que no se implementan bancos, imports, recurring, income ni budgets en esta historia.
-- [ ] Correr:
+- [x] Validar campos requeridos.
+- [x] Crear expense en estado local.
+- [x] Guardar expense en `localStorage` si storage ya esta activo.
+- [x] Limpiar formulario despues de guardar.
+- [x] Cancelar debe cerrar y descartar datos.
+- [x] Crear `ConfirmDeleteDialog`.
+- [x] Permitir eliminar expense existente.
+- [x] Pedir confirmacion antes de eliminar.
+- [x] Confirmar que eliminar remueve el expense del contexto correspondiente.
+- [x] Confirmar que no se implementan bancos, imports, recurring, income ni budgets en esta historia.
+- [x] Correr:
 
 ```bash
 npm run lint
 npm run build
 ```
 
-- [ ] Commit:
+- [x] Commit:
 
 ```bash
 git add .

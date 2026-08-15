@@ -33,6 +33,12 @@ export function formatMonth(date: Date) {
   return monthFormatter.format(date);
 }
 
+export function formatDateRange(range: PeriodRange) {
+  return `${dateFormatter.format(range.start)} - ${dateFormatter.format(
+    range.end,
+  )}`;
+}
+
 export function formatDateInput(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");

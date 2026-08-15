@@ -6,16 +6,15 @@ import {
   AppShell,
   Button,
   Card,
-  Panel,
-  SectionHeader,
 } from "@/components/design-system";
 
 import { createSeedExpenses } from "../data";
 import {
   formatCurrency,
-  formatDate,
-  formatMonth,
-  isSameMonth,
+  formatDateRange,
+  getPeriodRange,
+  isWithinPeriod,
+  movePeriod,
   sortByDateDesc,
   sumExpenses,
 } from "../utils";
@@ -23,9 +22,11 @@ import {
   readStoredExpenses,
   saveStoredExpenses,
 } from "../storage";
-import type { Expense } from "../types";
+import type { Expense, FinancePeriod } from "../types";
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
+import { ExpenseDetail } from "./expense-detail";
 import { ExpenseForm } from "./expense-form";
+import { ExpenseHistory } from "./expense-history";
 
 export function FinanceWorkspace() {
   const today = useMemo(() => new Date(), []);
@@ -33,19 +34,42 @@ export function FinanceWorkspace() {
   const [expenses, setExpenses] = useState(seedExpenses);
   const [hasLoadedStoredExpenses, setHasLoadedStoredExpenses] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+  const [period, setPeriod] = useState<FinancePeriod>("Monthly");
+  const [anchorDate, setAnchorDate] = useState(today);
+  const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
+    null,
+  );
   const [expensePendingDelete, setExpensePendingDelete] =
     useState<Expense | null>(null);
 
-  const currentMonthExpenses = useMemo(() => {
-    return sortByDateDesc(
-      expenses.filter((expense) => isSameMonth(expense.date, today)),
-    );
-  }, [expenses, today]);
-
-  const currentMonthTotal = useMemo(
-    () => sumExpenses(currentMonthExpenses),
-    [currentMonthExpenses],
+  const periodRange = useMemo(
+    () => getPeriodRange(period, anchorDate),
+    [period, anchorDate],
   );
+  const periodRangeLabel = useMemo(
+    () => formatDateRange(periodRange),
+    [periodRange],
+  );
+
+  const periodExpenses = useMemo(() => {
+    return sortByDateDesc(
+      expenses.filter((expense) => isWithinPeriod(expense.date, periodRange)),
+    );
+  }, [expenses, periodRange]);
+
+  const periodTotal = useMemo(
+    () => sumExpenses(periodExpenses),
+    [periodExpenses],
+  );
+
+  const selectedExpense = useMemo(
+    () =>
+      periodExpenses.find((expense) => expense.id === selectedExpenseId) ??
+      periodExpenses[0] ??
+      null,
+    [periodExpenses, selectedExpenseId],
+  );
+  const activeSelectedExpenseId = selectedExpense?.id ?? null;
 
   useEffect(() => {
     const storedExpenses = readStoredExpenses(seedExpenses);
@@ -68,6 +92,8 @@ export function FinanceWorkspace() {
     setExpenses((currentExpenses) =>
       sortByDateDesc([expense, ...currentExpenses]),
     );
+    setSelectedExpenseId(expense.id);
+    setAnchorDate(new Date(`${expense.date}T00:00:00`));
     setIsAddExpenseOpen(false);
   }
 
@@ -81,7 +107,22 @@ export function FinanceWorkspace() {
         (expense) => expense.id !== expensePendingDelete.id,
       ),
     );
+    setSelectedExpenseId((currentSelectedExpenseId) =>
+      currentSelectedExpenseId === expensePendingDelete.id
+        ? null
+        : currentSelectedExpenseId,
+    );
     setExpensePendingDelete(null);
+  }
+
+  function handleChangePeriod(nextPeriod: FinancePeriod) {
+    setPeriod(nextPeriod);
+  }
+
+  function handleMovePeriod(direction: -1 | 1) {
+    setAnchorDate((currentAnchorDate) =>
+      movePeriod(period, currentAnchorDate, direction),
+    );
   }
 
   return (
@@ -96,7 +137,8 @@ export function FinanceWorkspace() {
               Finance
             </h1>
             <p className="mt-5 max-w-[560px] text-[13px] leading-6 text-[var(--text-muted)]">
-              Record everyday spending and keep the current month easy to read.
+              Record everyday spending and review spending by week, two-week
+              period, or month.
             </p>
           </div>
 
@@ -108,82 +150,33 @@ export function FinanceWorkspace() {
         </header>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
-          <Panel>
-            <SectionHeader
-              title="Current month expenses"
-              action={formatMonth(today)}
-            />
-
-            {currentMonthExpenses.length > 0 ? (
-              <div className="mt-5 space-y-3">
-                {currentMonthExpenses.map((expense) => (
-                  <article
-                    key={expense.id}
-                    className="grid min-h-[92px] grid-cols-[minmax(0,1fr)_auto] items-start gap-4 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5 max-sm:grid-cols-1"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex min-w-0 flex-wrap items-center gap-2">
-                        <h3 className="min-w-0 text-[14px] font-medium leading-5">
-                          {expense.name}
-                        </h3>
-                        {expense.category ? (
-                          <span className="rounded-full bg-[rgba(126,168,139,0.22)] px-3 py-1 text-[10px] leading-4 text-[var(--text-primary)]">
-                            {expense.category}
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="mt-2 text-[11px] leading-5 text-[var(--text-muted)]">
-                        {formatDate(expense.date)}
-                      </p>
-                    </div>
-
-                    <div className="flex min-w-0 items-start gap-3 justify-self-end max-sm:w-full max-sm:justify-between">
-                      <span className="text-[14px] font-medium leading-5">
-                        {formatCurrency(expense.amount)}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        className="min-h-9 px-3"
-                        onClick={() => setExpensePendingDelete(expense)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <div className="mt-5 rounded-[18px] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5">
-                <p className="text-[13px] font-medium leading-5">
-                  No expenses recorded this month.
-                </p>
-                <p className="mt-2 text-[11px] leading-5 text-[var(--text-muted)]">
-                  New spending will appear in this monthly view.
-                </p>
-                <div className="mt-5">
-                  <Button
-                    variant="secondary"
-                    onClick={() => setIsAddExpenseOpen(true)}
-                  >
-                    Add expense
-                  </Button>
-                </div>
-              </div>
-            )}
-          </Panel>
+          <ExpenseHistory
+            expenses={periodExpenses}
+            period={period}
+            rangeLabel={periodRangeLabel}
+            total={periodTotal}
+            selectedExpenseId={activeSelectedExpenseId}
+            onAddExpense={() => setIsAddExpenseOpen(true)}
+            onChangePeriod={handleChangePeriod}
+            onMovePeriod={handleMovePeriod}
+            onRemoveExpense={setExpensePendingDelete}
+            onSelectExpense={setSelectedExpenseId}
+          />
 
           <aside className="min-w-0 space-y-6">
             <Card>
               <p className="text-[12px] leading-5 text-[var(--text-muted)]">
-                Total spent
+                Period spent
               </p>
               <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
-                {formatCurrency(currentMonthTotal)}
+                {formatCurrency(periodTotal)}
               </p>
               <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
-                {currentMonthExpenses.length} expenses in {formatMonth(today)}
+                {periodExpenses.length} expenses in the selected period
               </p>
             </Card>
+
+            <ExpenseDetail expense={selectedExpense} />
 
             <Card>
               <p className="text-[12px] font-medium leading-5">

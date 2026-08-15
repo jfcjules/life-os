@@ -247,41 +247,41 @@ Archivo de referencia:
 docs/user_stories/finance/us-03-view-expenses-history.md
 ```
 
-- [ ] Leer la historia completa y sus Acceptance Criteria.
-- [ ] Crear `ExpenseHistory`.
-- [ ] Crear `ExpenseRow`.
-- [ ] Crear `ExpenseDetail`.
-- [ ] Crear `FinancePeriodSelector`.
-- [ ] Mostrar seccion clara de expense history.
-- [ ] Mostrar expenses en orden cronologico.
-- [ ] Mostrar por expense:
-  - [ ] Name
-  - [ ] Amount
-  - [ ] Date
+- [x] Leer la historia completa y sus Acceptance Criteria.
+- [x] Crear `ExpenseHistory`.
+- [x] Crear `ExpenseRow`.
+- [x] Crear `ExpenseDetail`.
+- [x] Crear `FinancePeriodSelector`.
+- [x] Mostrar seccion clara de expense history.
+- [x] Mostrar expenses en orden cronologico.
+- [x] Mostrar por expense:
+  - [x] Name
+  - [x] Amount
+  - [x] Date
 
-- [ ] Agregar selector:
-  - [ ] Weekly
-  - [ ] Biweekly
-  - [ ] Monthly
+- [x] Agregar selector:
+  - [x] Weekly
+  - [x] Biweekly
+  - [x] Monthly
 
-- [ ] Setear `Monthly` como default.
-- [ ] Mostrar date range seleccionado.
-- [ ] Agregar previous period control.
-- [ ] Agregar next period control.
-- [ ] Actualizar lista al cambiar periodo.
-- [ ] Mostrar total spent del periodo.
-- [ ] Permitir seleccionar expense para ver detalles disponibles.
-- [ ] Mostrar empty state si no hay expenses en el periodo.
-- [ ] Confirmar que expenses eliminados no aparecen.
-- [ ] Confirmar que no se implementa custom date range, imports, analytics ni receipt scanning.
-- [ ] Correr:
+- [x] Setear `Monthly` como default.
+- [x] Mostrar date range seleccionado.
+- [x] Agregar previous period control.
+- [x] Agregar next period control.
+- [x] Actualizar lista al cambiar periodo.
+- [x] Mostrar total spent del periodo.
+- [x] Permitir seleccionar expense para ver detalles disponibles.
+- [x] Mostrar empty state si no hay expenses en el periodo.
+- [x] Confirmar que expenses eliminados no aparecen.
+- [x] Confirmar que no se implementa custom date range, imports, analytics ni receipt scanning.
+- [x] Correr:
 
 ```bash
 npm run lint
 npm run build
 ```
 
-- [ ] Commit:
+- [x] Commit:
 
 ```bash
 git add .
@@ -598,8 +598,8 @@ Cada user story se considera lista solo si:
 
 ## 16. Orden recomendado de historias
 
-- [ ] US-01 - Add new expense
-- [ ] US-03 - View expenses history
+- [x] US-01 - Add new expense
+- [x] US-03 - View expenses history
 - [ ] US-04 - View expenses by ownership
 - [ ] US-02 - Add new budget
 - [ ] US-05 - Assign expenses and budgets to a user
@@ -648,19 +648,19 @@ Antes de cerrar:
 
 Duracion sugerida: 60 a 90 minutos.
 
-- [ ] Revisar `git status`.
-- [ ] Crear branch `codex/finance-us-01-add-expense`.
-- [ ] Leer `US-01`.
-- [ ] Crear `src/features/finance/types.ts`.
-- [ ] Crear `src/features/finance/data.ts`.
-- [ ] Crear `src/features/finance/utils.ts`.
-- [ ] Crear `src/features/finance/storage.ts`.
-- [ ] Crear `src/features/finance/components/finance-workspace.tsx`.
-- [ ] Cambiar `src/app/finance/page.tsx`.
-- [ ] Renderizar pantalla Finance real con acciones y seed expenses.
-- [ ] Implementar modal Add expense.
-- [ ] Implementar remove expense con confirmacion.
-- [ ] Correr `npm run lint`.
-- [ ] Correr `npm run build`.
-- [ ] Revisar diff.
-- [ ] Commit.
+- [x] Revisar `git status`.
+- [x] Crear branch `codex/finance-us-01-add-expense`.
+- [x] Leer `US-01`.
+- [x] Crear `src/features/finance/types.ts`.
+- [x] Crear `src/features/finance/data.ts`.
+- [x] Crear `src/features/finance/utils.ts`.
+- [x] Crear `src/features/finance/storage.ts`.
+- [x] Crear `src/features/finance/components/finance-workspace.tsx`.
+- [x] Cambiar `src/app/finance/page.tsx`.
+- [x] Renderizar pantalla Finance real con acciones y seed expenses.
+- [x] Implementar modal Add expense.
+- [x] Implementar remove expense con confirmacion.
+- [x] Correr `npm run lint`.
+- [x] Correr `npm run build`.
+- [x] Revisar diff.
+- [x] Commit.

@@ -1,5 +1,5 @@
-import { EmptyWorkspace } from "@/components/design-system";
+import { FinanceWorkspace } from "@/features/finance/components/finance-workspace";
 
 export default function FinancePage() {
-  return <EmptyWorkspace title="Finance" />;
+  return <FinanceWorkspace />;
 }

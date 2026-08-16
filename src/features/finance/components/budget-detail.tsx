@@ -1,18 +1,23 @@
 import { Button, Card, SectionHeader } from "@/components/design-system";
 
-import type { Budget } from "../types";
+import type { Budget, BudgetConcept, Expense } from "../types";
 import {
   calculateBudgetPlannedAmount,
+  calculateProgressPercent,
   formatBudgetPeriod,
   formatCurrency,
   getBudgetConcepts,
+  getProgressStatus,
+  sumLinkedExpensesForConcept,
 } from "../utils";
 
 export function BudgetDetail({
   budget,
+  expenses,
   onAddConcept,
 }: {
   budget: Budget | null;
+  expenses: Expense[];
   onAddConcept: () => void;
 }) {
   if (!budget) {
@@ -58,17 +63,12 @@ export function BudgetDetail({
       {concepts.length > 0 ? (
         <div className="mt-4 space-y-3">
           {concepts.map((concept) => (
-            <div
+            <ConceptProgress
               key={concept.id}
-              className="flex min-h-[64px] items-center justify-between gap-4 rounded-[16px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 py-3"
-            >
-              <p className="min-w-0 text-[13px] font-medium leading-5">
-                {concept.name}
-              </p>
-              <p className="shrink-0 text-[13px] font-medium leading-5">
-                {formatCurrency(concept.amount)}
-              </p>
-            </div>
+              budgetId={budget.id}
+              concept={concept}
+              expenses={expenses}
+            />
           ))}
         </div>
       ) : (
@@ -79,5 +79,65 @@ export function BudgetDetail({
         </div>
       )}
     </Card>
+  );
+}
+
+function ConceptProgress({
+  budgetId,
+  concept,
+  expenses,
+}: {
+  budgetId: string;
+  concept: BudgetConcept;
+  expenses: Expense[];
+}) {
+  const spentAmount = sumLinkedExpensesForConcept(
+    expenses,
+    budgetId,
+    concept.id,
+  );
+  const progressPercent = calculateProgressPercent(
+    spentAmount,
+    concept.amount,
+  );
+  const progressStatus = getProgressStatus(spentAmount, concept.amount);
+  const isOverBudget = progressStatus === "Over budget";
+  const isComplete = progressStatus === "Complete";
+  const progressColor = isOverBudget
+    ? "bg-[rgba(214,155,168,0.88)]"
+    : isComplete
+      ? "bg-[rgba(126,168,139,0.88)]"
+      : "bg-[var(--color-action-primary)]";
+
+  return (
+    <div className="rounded-[16px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 py-3">
+      <div className="flex min-w-0 items-start justify-between gap-4 max-sm:flex-col">
+        <div className="min-w-0">
+          <p className="min-w-0 text-[13px] font-medium leading-5">
+            {concept.name}
+          </p>
+          <p className="mt-1 text-[11px] leading-5 text-[var(--text-muted)]">
+            {progressStatus}
+          </p>
+        </div>
+        <p className="shrink-0 text-[13px] font-medium leading-5">
+          {formatCurrency(spentAmount)} / {formatCurrency(concept.amount)}
+        </p>
+      </div>
+
+      <div
+        className="mt-3 h-2 overflow-hidden rounded-full bg-[rgba(227,233,247,0.9)]"
+        role="progressbar"
+        aria-label={`${concept.name} spending progress`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(progressPercent)}
+      >
+        <div
+          className={`h-full rounded-full ${progressColor}`}
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
+    </div>
   );
 }

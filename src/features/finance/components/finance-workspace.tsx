@@ -298,6 +298,7 @@ export function FinanceWorkspace() {
             <aside className="min-w-0 space-y-6">
               <BudgetDetail
                 budget={selectedBudget}
+                expenses={expenses}
                 onAddConcept={() => setIsAddConceptOpen(true)}
               />
 

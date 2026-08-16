@@ -146,6 +146,39 @@ export function sumBudgetPlannedAmounts(budgets: Budget[]) {
   );
 }
 
+export function sumLinkedExpensesForConcept(
+  expenses: Expense[],
+  budgetId: string,
+  conceptId: string,
+) {
+  return expenses.reduce((total, expense) => {
+    const isLinkedToConcept =
+      expense.budgetId === budgetId && expense.budgetConceptId === conceptId;
+
+    return isLinkedToConcept ? total + expense.amount : total;
+  }, 0);
+}
+
+export function calculateProgressPercent(spentAmount: number, plannedAmount: number) {
+  if (plannedAmount <= 0) {
+    return 0;
+  }
+
+  return Math.min((spentAmount / plannedAmount) * 100, 100);
+}
+
+export function getProgressStatus(spentAmount: number, plannedAmount: number) {
+  if (spentAmount > plannedAmount) {
+    return "Over budget";
+  }
+
+  if (spentAmount === plannedAmount && plannedAmount > 0) {
+    return "Complete";
+  }
+
+  return "On track";
+}
+
 export function createBudgetWeekOptions(monthInput: string) {
   const [year, month] = monthInput.split("-").map(Number);
 

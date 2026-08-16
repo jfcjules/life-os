@@ -335,6 +335,7 @@ export function FinanceWorkspace() {
 
       {activeFinanceView === "Expenses" && isAddExpenseOpen ? (
         <ExpenseForm
+          budgets={budgets}
           today={today}
           onAddExpense={handleAddExpense}
           onCancel={() => setIsAddExpenseOpen(false)}

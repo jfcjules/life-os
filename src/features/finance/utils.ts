@@ -81,6 +81,52 @@ export function formatBudgetPeriod(budget: Budget) {
   return `${month}, ${weekOption?.shortLabel ?? "Week 1"}`;
 }
 
+export function getBudgetRange(budget: Budget): PeriodRange | null {
+  const [year, month] = budget.month.split("-").map(Number);
+
+  if (!year || !month) {
+    return null;
+  }
+
+  if (budget.period === "Monthly") {
+    return {
+      start: new Date(year, month - 1, 1),
+      end: new Date(year, month, 0),
+    };
+  }
+
+  if (budget.period === "Bi-weekly") {
+    const startsOnSecondHalf = budget.halfMonth === "second-half";
+
+    return {
+      start: new Date(year, month - 1, startsOnSecondHalf ? 16 : 1),
+      end: startsOnSecondHalf
+        ? new Date(year, month, 0)
+        : new Date(year, month - 1, 15),
+    };
+  }
+
+  const weekNumber = Number(budget.week?.replace("week-", "") ?? 1);
+  const lastDay = new Date(year, month, 0).getDate();
+  const startDay = Math.min(Math.max((weekNumber - 1) * 7 + 1, 1), lastDay);
+  const endDay = Math.min(startDay + 6, lastDay);
+
+  return {
+    start: new Date(year, month - 1, startDay),
+    end: new Date(year, month - 1, endDay),
+  };
+}
+
+export function findBudgetForDate(budgets: Budget[], date: string) {
+  return (
+    budgets.find((budget) => {
+      const range = getBudgetRange(budget);
+
+      return range ? isWithinPeriod(date, range) : false;
+    }) ?? null
+  );
+}
+
 export function getBudgetConcepts(budget: Budget) {
   return Array.isArray(budget.concepts) ? budget.concepts : [];
 }

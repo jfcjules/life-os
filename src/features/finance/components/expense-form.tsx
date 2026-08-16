@@ -3,17 +3,23 @@ import { useMemo, useState } from "react";
 
 import { Button } from "@/components/design-system";
 
-import type { Expense } from "../types";
-import { formatDateInput } from "../utils";
+import type { Budget, Expense } from "../types";
+import {
+  findBudgetForDate,
+  formatDateInput,
+  getBudgetConcepts,
+} from "../utils";
 
 const fieldClass =
   "min-h-11 w-full rounded-[14px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 text-[12px] text-[var(--text-primary)] outline-none transition focus:border-[var(--color-action-primary)]";
 
 export function ExpenseForm({
+  budgets,
   today,
   onAddExpense,
   onCancel,
 }: {
+  budgets: Budget[];
   today: Date;
   onAddExpense: (expense: Expense) => void;
   onCancel: () => void;
@@ -23,7 +29,19 @@ export function ExpenseForm({
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(defaultDate);
   const [category, setCategory] = useState("");
+  const [selectedConceptId, setSelectedConceptId] = useState("");
   const [error, setError] = useState("");
+  const activeBudget = useMemo(
+    () => findBudgetForDate(budgets, date),
+    [budgets, date],
+  );
+  const activeBudgetConcepts = useMemo(
+    () => (activeBudget ? getBudgetConcepts(activeBudget) : []),
+    [activeBudget],
+  );
+  const selectedConcept =
+    activeBudgetConcepts.find((concept) => concept.id === selectedConceptId) ??
+    null;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,7 +64,12 @@ export function ExpenseForm({
       amount: parsedAmount,
       date,
       ownership: "Personal",
-      category: category.trim() || undefined,
+      category:
+        activeBudgetConcepts.length > 0
+          ? selectedConcept?.name
+          : category.trim() || undefined,
+      budgetId: selectedConcept && activeBudget ? activeBudget.id : undefined,
+      budgetConceptId: selectedConcept?.id,
       frequency: "One-time",
       tagIds: [],
     });
@@ -118,14 +141,40 @@ export function ExpenseForm({
             </label>
           </div>
 
-          <label className="grid gap-2 text-[11px] leading-4 text-[var(--text-muted)]">
-            Category
-            <input
-              className={fieldClass}
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
-            />
-          </label>
+          {activeBudgetConcepts.length > 0 ? (
+            <label className="grid gap-2 text-[11px] leading-4 text-[var(--text-muted)]">
+              Category
+              <select
+                className={fieldClass}
+                value={selectedConcept?.id ?? ""}
+                onChange={(event) => setSelectedConceptId(event.target.value)}
+              >
+                <option value="">No budget category</option>
+                {activeBudgetConcepts.map((concept) => (
+                  <option key={concept.id} value={concept.id}>
+                    {concept.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <label className="grid gap-2 text-[11px] leading-4 text-[var(--text-muted)]">
+              Category
+              <input
+                className={fieldClass}
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+              />
+            </label>
+          )}
+
+          <p className="rounded-[14px] bg-[rgba(227,233,247,0.68)] px-4 py-3 text-[11px] leading-5 text-[var(--text-muted)]">
+            {activeBudget
+              ? activeBudgetConcepts.length > 0
+                ? `Categories loaded from ${activeBudget.name}.`
+                : `${activeBudget.name} has no concepts yet.`
+              : "No active budget found for this expense date."}
+          </p>
         </div>
 
         {error ? (

@@ -23,6 +23,8 @@ export type Expense = {
   date: string;
   ownership: FinanceSpace;
   category?: string;
+  budgetId?: string;
+  budgetConceptId?: string;
   assignedUserId?: string;
   dueDate?: string;
   frequency: FinanceFrequency;

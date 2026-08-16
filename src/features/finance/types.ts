@@ -2,7 +2,7 @@ export type FinanceSpace = "Personal" | "Couple";
 
 export type FinanceOwnershipFilter = "All" | FinanceSpace;
 
-export type FinancePeriod = "Weekly" | "Biweekly" | "Monthly";
+export type FinancePeriod = "Weekly" | "Bi-weekly" | "Monthly";
 
 export type FinanceFrequency = "One-time" | "Weekly" | "Monthly" | "Yearly";
 
@@ -32,14 +32,11 @@ export type Expense = {
 export type Budget = {
   id: string;
   name: string;
-  amount: number;
   period: FinancePeriod;
-  ownership: FinanceSpace;
-  category?: string;
-  assignedUserId?: string;
-  dueDate?: string;
-  frequency: FinanceFrequency;
-  tagIds: string[];
+  month: string;
+  halfMonth?: "first-half" | "second-half";
+  week?: "week-1" | "week-2" | "week-3" | "week-4" | "week-5";
+  createdAt: string;
 };
 
 export type Income = {

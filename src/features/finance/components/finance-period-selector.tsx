@@ -4,7 +4,7 @@ import { IconButton } from "@/components/design-system";
 
 import type { FinancePeriod } from "../types";
 
-const periods: FinancePeriod[] = ["Weekly", "Biweekly", "Monthly"];
+const periods: FinancePeriod[] = ["Weekly", "Bi-weekly", "Monthly"];
 
 export function FinancePeriodSelector({
   period,

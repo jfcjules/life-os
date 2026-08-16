@@ -8,7 +8,10 @@ import {
   Card,
 } from "@/components/design-system";
 
-import { createSeedExpenses } from "../data";
+import {
+  createSeedBudgets,
+  createSeedExpenses,
+} from "../data";
 import {
   formatCurrency,
   formatDateRange,
@@ -19,21 +22,35 @@ import {
   sumExpenses,
 } from "../utils";
 import {
+  readStoredBudgets,
   readStoredExpenses,
+  saveStoredBudgets,
   saveStoredExpenses,
 } from "../storage";
-import type { Expense, FinancePeriod } from "../types";
+import type { Budget, Expense, FinancePeriod } from "../types";
+import { BudgetForm } from "./budget-form";
+import { BudgetList } from "./budget-list";
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 import { ExpenseDetail } from "./expense-detail";
 import { ExpenseForm } from "./expense-form";
 import { ExpenseHistory } from "./expense-history";
+import {
+  FinanceViewToggle,
+  type FinanceView,
+} from "./finance-view-toggle";
 
 export function FinanceWorkspace() {
   const today = useMemo(() => new Date(), []);
   const seedExpenses = useMemo(() => createSeedExpenses(today), [today]);
+  const seedBudgets = useMemo(() => createSeedBudgets(), []);
   const [expenses, setExpenses] = useState(seedExpenses);
+  const [budgets, setBudgets] = useState(seedBudgets);
+  const [activeFinanceView, setActiveFinanceView] =
+    useState<FinanceView>("Expenses");
   const [hasLoadedStoredExpenses, setHasLoadedStoredExpenses] = useState(false);
+  const [hasLoadedStoredBudgets, setHasLoadedStoredBudgets] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+  const [isAddBudgetOpen, setIsAddBudgetOpen] = useState(false);
   const [period, setPeriod] = useState<FinancePeriod>("Monthly");
   const [anchorDate, setAnchorDate] = useState(today);
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
@@ -81,12 +98,29 @@ export function FinanceWorkspace() {
   }, [seedExpenses]);
 
   useEffect(() => {
+    const storedBudgets = readStoredBudgets(seedBudgets);
+
+    window.queueMicrotask(() => {
+      setBudgets(storedBudgets);
+      setHasLoadedStoredBudgets(true);
+    });
+  }, [seedBudgets]);
+
+  useEffect(() => {
     if (!hasLoadedStoredExpenses) {
       return;
     }
 
     saveStoredExpenses(expenses);
   }, [expenses, hasLoadedStoredExpenses]);
+
+  useEffect(() => {
+    if (!hasLoadedStoredBudgets) {
+      return;
+    }
+
+    saveStoredBudgets(budgets);
+  }, [budgets, hasLoadedStoredBudgets]);
 
   function handleAddExpense(expense: Expense) {
     setExpenses((currentExpenses) =>
@@ -95,6 +129,11 @@ export function FinanceWorkspace() {
     setSelectedExpenseId(expense.id);
     setAnchorDate(new Date(`${expense.date}T00:00:00`));
     setIsAddExpenseOpen(false);
+  }
+
+  function handleAddBudget(budget: Budget) {
+    setBudgets((currentBudgets) => [budget, ...currentBudgets]);
+    setIsAddBudgetOpen(false);
   }
 
   function handleConfirmDeleteExpense() {
@@ -137,73 +176,127 @@ export function FinanceWorkspace() {
               Finance
             </h1>
             <p className="mt-5 max-w-[560px] text-[13px] leading-6 text-[var(--text-muted)]">
-              Record everyday spending and review spending by week, two-week
-              period, or month.
+              Record everyday spending and keep budget planning in the same
+              quiet Finance space.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-3 max-md:justify-start">
-            <Button onClick={() => setIsAddExpenseOpen(true)}>
-              Add expense
-            </Button>
+            {activeFinanceView === "Expenses" ? (
+              <Button onClick={() => setIsAddExpenseOpen(true)}>
+                Add expense
+              </Button>
+            ) : (
+              <Button onClick={() => setIsAddBudgetOpen(true)}>
+                Add budget
+              </Button>
+            )}
           </div>
         </header>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
-          <ExpenseHistory
-            expenses={periodExpenses}
-            period={period}
-            rangeLabel={periodRangeLabel}
-            total={periodTotal}
-            selectedExpenseId={activeSelectedExpenseId}
-            onAddExpense={() => setIsAddExpenseOpen(true)}
-            onChangePeriod={handleChangePeriod}
-            onMovePeriod={handleMovePeriod}
-            onRemoveExpense={setExpensePendingDelete}
-            onSelectExpense={setSelectedExpenseId}
-          />
+        <FinanceViewToggle
+          activeView={activeFinanceView}
+          onSelectView={setActiveFinanceView}
+        />
 
-          <aside className="min-w-0 space-y-6">
-            <Card>
-              <p className="text-[12px] leading-5 text-[var(--text-muted)]">
-                Period spent
-              </p>
-              <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
-                {formatCurrency(periodTotal)}
-              </p>
-              <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
-                {periodExpenses.length} expenses in the selected period
-              </p>
-            </Card>
+        {activeFinanceView === "Expenses" ? (
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
+            <ExpenseHistory
+              expenses={periodExpenses}
+              period={period}
+              rangeLabel={periodRangeLabel}
+              total={periodTotal}
+              selectedExpenseId={activeSelectedExpenseId}
+              onAddExpense={() => setIsAddExpenseOpen(true)}
+              onChangePeriod={handleChangePeriod}
+              onMovePeriod={handleMovePeriod}
+              onRemoveExpense={setExpensePendingDelete}
+              onSelectExpense={setSelectedExpenseId}
+            />
 
-            <ExpenseDetail expense={selectedExpense} />
+            <aside className="min-w-0 space-y-6">
+              <Card>
+                <p className="text-[12px] leading-5 text-[var(--text-muted)]">
+                  Period spent
+                </p>
+                <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
+                  {formatCurrency(periodTotal)}
+                </p>
+                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+                  {periodExpenses.length} expenses in the selected period
+                </p>
+              </Card>
 
-            <Card>
-              <p className="text-[12px] font-medium leading-5">
-                Quick action
-              </p>
-              <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
-                Keep the entry small and specific.
-              </p>
-              <div className="mt-5">
-                <Button
-                  variant="secondary"
-                  className="w-full"
-                  onClick={() => setIsAddExpenseOpen(true)}
-                >
-                  Add expense
-                </Button>
-              </div>
-            </Card>
-          </aside>
-        </div>
+              <ExpenseDetail expense={selectedExpense} />
+
+              <Card>
+                <p className="text-[12px] font-medium leading-5">
+                  Quick action
+                </p>
+                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+                  Keep the entry small and specific.
+                </p>
+                <div className="mt-5">
+                  <Button
+                    variant="secondary"
+                    className="w-full"
+                    onClick={() => setIsAddExpenseOpen(true)}
+                  >
+                    Add expense
+                  </Button>
+                </div>
+              </Card>
+            </aside>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
+            <BudgetList
+              budgets={budgets}
+              onAddBudget={() => setIsAddBudgetOpen(true)}
+            />
+
+            <aside className="min-w-0 space-y-6">
+              <Card>
+                <p className="text-[12px] leading-5 text-[var(--text-muted)]">
+                  Planned
+                </p>
+                <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
+                  {formatCurrency(0)}
+                </p>
+                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+                  {budgets.length} budgets in the selected view
+                </p>
+              </Card>
+
+              <Card>
+                <p className="text-[12px] leading-5 text-[var(--text-muted)]">
+                  Concepts
+                </p>
+                <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
+                  0
+                </p>
+                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+                  No planned expense concepts yet
+                </p>
+              </Card>
+            </aside>
+          </div>
+        )}
       </div>
 
-      {isAddExpenseOpen ? (
+      {activeFinanceView === "Expenses" && isAddExpenseOpen ? (
         <ExpenseForm
           today={today}
           onAddExpense={handleAddExpense}
           onCancel={() => setIsAddExpenseOpen(false)}
+        />
+      ) : null}
+
+      {activeFinanceView === "Budget" && isAddBudgetOpen ? (
+        <BudgetForm
+          today={today}
+          onAddBudget={handleAddBudget}
+          onCancel={() => setIsAddBudgetOpen(false)}
         />
       ) : null}
 

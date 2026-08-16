@@ -1,4 +1,4 @@
-import type { Expense, FinanceFrequency, FinancePeriod, Income } from "./types";
+import type { Budget, Expense, FinanceFrequency, FinancePeriod, Income } from "./types";
 
 export type PeriodRange = {
   start: Date;
@@ -45,6 +45,56 @@ export function formatDateInput(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
+}
+
+export function formatMonthInput(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+
+  return `${year}-${month}`;
+}
+
+export function formatBudgetPeriod(budget: Budget) {
+  const month = formatBudgetMonth(budget.month);
+
+  if (budget.period === "Monthly") {
+    return month;
+  }
+
+  if (budget.period === "Bi-weekly") {
+    return `${month}, ${
+      budget.halfMonth === "second-half" ? "16-end" : "1-15"
+    }`;
+  }
+
+  const weekOption = createBudgetWeekOptions(budget.month).find(
+    (option) => option.value === budget.week,
+  );
+
+  return `${month}, ${weekOption?.shortLabel ?? "Week 1"}`;
+}
+
+export function createBudgetWeekOptions(monthInput: string) {
+  const [year, month] = monthInput.split("-").map(Number);
+
+  if (!year || !month) {
+    return [];
+  }
+
+  const lastDay = new Date(year, month, 0).getDate();
+
+  return Array.from({ length: Math.ceil(lastDay / 7) }, (_, index) => {
+    const startDay = index * 7 + 1;
+    const endDay = Math.min(startDay + 6, lastDay);
+    const value = `week-${index + 1}` as Budget["week"];
+    const shortLabel = `Week ${index + 1}`;
+
+    return {
+      value,
+      label: `${shortLabel} (${startDay}-${endDay})`,
+      shortLabel,
+    };
+  });
 }
 
 export function getPeriodRange(
@@ -158,4 +208,14 @@ function startOfDay(date: Date) {
   const nextDate = new Date(date);
   nextDate.setHours(0, 0, 0, 0);
   return nextDate;
+}
+
+function formatBudgetMonth(monthInput: string) {
+  const [year, month] = monthInput.split("-").map(Number);
+
+  if (!year || !month) {
+    return monthInput;
+  }
+
+  return monthFormatter.format(new Date(year, month - 1, 1));
 }

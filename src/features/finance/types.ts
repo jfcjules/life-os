@@ -1,0 +1,59 @@
+export type FinanceSpace = "Personal" | "Couple";
+
+export type FinanceOwnershipFilter = "All" | FinanceSpace;
+
+export type FinancePeriod = "Weekly" | "Bi-weekly" | "Monthly";
+
+export type FinanceFrequency = "One-time" | "Weekly" | "Monthly" | "Yearly";
+
+export type FinanceUser = {
+  id: string;
+  name: string;
+};
+
+export type FinanceTag = {
+  id: string;
+  label: string;
+};
+
+export type Expense = {
+  id: string;
+  name: string;
+  amount: number;
+  date: string;
+  ownership: FinanceSpace;
+  category?: string;
+  budgetId?: string;
+  budgetConceptId?: string;
+  assignedUserId?: string;
+  dueDate?: string;
+  frequency: FinanceFrequency;
+  tagIds: string[];
+};
+
+export type BudgetConcept = {
+  id: string;
+  name: string;
+  amount: number;
+};
+
+export type Budget = {
+  id: string;
+  name: string;
+  period: FinancePeriod;
+  month: string;
+  halfMonth?: "first-half" | "second-half";
+  week?: "week-1" | "week-2" | "week-3" | "week-4" | "week-5";
+  concepts: BudgetConcept[];
+  createdAt: string;
+};
+
+export type Income = {
+  id: string;
+  name: string;
+  amount: number;
+  date: string;
+  category?: string;
+  frequency?: FinanceFrequency;
+  tagIds: string[];
+};

@@ -15,6 +15,8 @@
   --accent-lilac: #a594c7;
   --accent-rose: #d69ba8;
   --accent-amber: #d5b276;
+  --font-azeret-mono: "Azeret Mono", "SFMono-Regular", Consolas,
+    "Liberation Mono", monospace;
 }
 
 @theme inline {

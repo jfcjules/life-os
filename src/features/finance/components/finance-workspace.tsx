@@ -21,6 +21,8 @@ import {
   isWithinPeriod,
   movePeriod,
   sortByDateDesc,
+  sumBudgetSpentAmount,
+  sumBudgetsSpentAmount,
   sumBudgetPlannedAmounts,
   sumExpenses,
 } from "../utils";
@@ -105,6 +107,14 @@ export function FinanceWorkspace() {
   const totalPlannedAmount = useMemo(
     () => sumBudgetPlannedAmounts(budgets),
     [budgets],
+  );
+  const totalBudgetSpentAmount = useMemo(
+    () => sumBudgetsSpentAmount(expenses, budgets),
+    [budgets, expenses],
+  );
+  const selectedBudgetSpentAmount = useMemo(
+    () => (selectedBudget ? sumBudgetSpentAmount(expenses, selectedBudget) : 0),
+    [expenses, selectedBudget],
   );
 
   useEffect(() => {
@@ -304,13 +314,14 @@ export function FinanceWorkspace() {
 
               <Card>
                 <p className="text-[12px] leading-5 text-[var(--text-muted)]">
-                  Total planned
+                  Total budget spent
                 </p>
                 <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
-                  {formatCurrency(totalPlannedAmount)}
+                  {formatCurrency(totalBudgetSpentAmount)}
                 </p>
                 <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
-                  {budgets.length} budgets in the selected view
+                  {formatCurrency(totalPlannedAmount)} planned across{" "}
+                  {budgets.length} budgets
                 </p>
               </Card>
 
@@ -319,13 +330,15 @@ export function FinanceWorkspace() {
                   Selected budget
                 </p>
                 <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
-                  {selectedBudget
-                    ? formatCurrency(calculateBudgetPlannedAmount(selectedBudget))
-                    : formatCurrency(0)}
+                  {formatCurrency(selectedBudgetSpentAmount)}
                 </p>
                 <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
                   {selectedBudget
-                    ? `${getBudgetConcepts(selectedBudget).length} concepts`
+                    ? `${formatCurrency(
+                        calculateBudgetPlannedAmount(selectedBudget),
+                      )} planned across ${
+                        getBudgetConcepts(selectedBudget).length
+                      } concepts`
                     : "No budget selected"}
                 </p>
               </Card>

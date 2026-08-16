@@ -146,17 +146,49 @@ export function sumBudgetPlannedAmounts(budgets: Budget[]) {
   );
 }
 
-export function sumLinkedExpensesForConcept(
+export function isExpenseWithinBudgetPeriod(expense: Expense, budget: Budget) {
+  const range = getBudgetRange(budget);
+
+  return range ? isWithinPeriod(expense.date, range) : false;
+}
+
+export function sumBudgetConceptSpent(
   expenses: Expense[],
-  budgetId: string,
+  budget: Budget,
   conceptId: string,
 ) {
   return expenses.reduce((total, expense) => {
     const isLinkedToConcept =
-      expense.budgetId === budgetId && expense.budgetConceptId === conceptId;
+      expense.budgetId === budget.id && expense.budgetConceptId === conceptId;
 
-    return isLinkedToConcept ? total + expense.amount : total;
+    return isLinkedToConcept && isExpenseWithinBudgetPeriod(expense, budget)
+      ? total + expense.amount
+      : total;
   }, 0);
+}
+
+export function sumBudgetSpentAmount(expenses: Expense[], budget: Budget) {
+  const conceptIds = new Set(
+    getBudgetConcepts(budget).map((concept) => concept.id),
+  );
+
+  return expenses.reduce((total, expense) => {
+    const isLinkedToBudgetConcept =
+      expense.budgetId === budget.id &&
+      expense.budgetConceptId &&
+      conceptIds.has(expense.budgetConceptId);
+
+    return isLinkedToBudgetConcept && isExpenseWithinBudgetPeriod(expense, budget)
+      ? total + expense.amount
+      : total;
+  }, 0);
+}
+
+export function sumBudgetsSpentAmount(expenses: Expense[], budgets: Budget[]) {
+  return budgets.reduce(
+    (total, budget) => total + sumBudgetSpentAmount(expenses, budget),
+    0,
+  );
 }
 
 export function calculateProgressPercent(spentAmount: number, plannedAmount: number) {

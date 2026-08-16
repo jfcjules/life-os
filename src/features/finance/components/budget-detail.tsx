@@ -8,7 +8,8 @@ import {
   formatCurrency,
   getBudgetConcepts,
   getProgressStatus,
-  sumLinkedExpensesForConcept,
+  sumBudgetConceptSpent,
+  sumBudgetSpentAmount,
 } from "../utils";
 
 export function BudgetDetail({
@@ -33,6 +34,7 @@ export function BudgetDetail({
 
   const concepts = getBudgetConcepts(budget);
   const plannedAmount = calculateBudgetPlannedAmount(budget);
+  const spentAmount = sumBudgetSpentAmount(expenses, budget);
 
   return (
     <Card>
@@ -44,9 +46,14 @@ export function BudgetDetail({
         </p>
         <p className="mt-2 text-[28px] font-medium leading-9 text-[var(--text-primary)]">
           {concepts.length > 0
-            ? formatCurrency(plannedAmount)
+            ? `${formatCurrency(spentAmount)} / ${formatCurrency(plannedAmount)}`
             : "No planned amount yet"}
         </p>
+        {concepts.length > 0 ? (
+          <p className="mt-2 text-[11px] leading-5 text-[var(--text-muted)]">
+            Spent in this budget period
+          </p>
+        ) : null}
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
@@ -65,7 +72,7 @@ export function BudgetDetail({
           {concepts.map((concept) => (
             <ConceptProgress
               key={concept.id}
-              budgetId={budget.id}
+              budget={budget}
               concept={concept}
               expenses={expenses}
             />
@@ -83,19 +90,15 @@ export function BudgetDetail({
 }
 
 function ConceptProgress({
-  budgetId,
+  budget,
   concept,
   expenses,
 }: {
-  budgetId: string;
+  budget: Budget;
   concept: BudgetConcept;
   expenses: Expense[];
 }) {
-  const spentAmount = sumLinkedExpensesForConcept(
-    expenses,
-    budgetId,
-    concept.id,
-  );
+  const spentAmount = sumBudgetConceptSpent(expenses, budget, concept.id);
   const progressPercent = calculateProgressPercent(
     spentAmount,
     concept.amount,

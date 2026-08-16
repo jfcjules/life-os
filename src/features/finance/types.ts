@@ -29,6 +29,12 @@ export type Expense = {
   tagIds: string[];
 };
 
+export type BudgetConcept = {
+  id: string;
+  name: string;
+  amount: number;
+};
+
 export type Budget = {
   id: string;
   name: string;
@@ -36,6 +42,7 @@ export type Budget = {
   month: string;
   halfMonth?: "first-half" | "second-half";
   week?: "week-1" | "week-2" | "week-3" | "week-4" | "week-5";
+  concepts: BudgetConcept[];
   createdAt: string;
 };
 

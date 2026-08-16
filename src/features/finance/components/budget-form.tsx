@@ -53,6 +53,7 @@ export function BudgetForm({
       month,
       halfMonth: period === "Bi-weekly" ? halfMonth : undefined,
       week: period === "Weekly" ? selectedWeek : undefined,
+      concepts: [],
       createdAt: new Date().toISOString(),
     });
   }

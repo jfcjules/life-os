@@ -1,4 +1,11 @@
-import type { Budget, Expense, FinanceFrequency, FinancePeriod, Income } from "./types";
+import type {
+  Budget,
+  BudgetConcept,
+  Expense,
+  FinanceFrequency,
+  FinancePeriod,
+  Income,
+} from "./types";
 
 export type PeriodRange = {
   start: Date;
@@ -72,6 +79,25 @@ export function formatBudgetPeriod(budget: Budget) {
   );
 
   return `${month}, ${weekOption?.shortLabel ?? "Week 1"}`;
+}
+
+export function getBudgetConcepts(budget: Budget) {
+  return Array.isArray(budget.concepts) ? budget.concepts : [];
+}
+
+export function sumBudgetConcepts(concepts: BudgetConcept[]) {
+  return concepts.reduce((total, concept) => total + concept.amount, 0);
+}
+
+export function calculateBudgetPlannedAmount(budget: Budget) {
+  return sumBudgetConcepts(getBudgetConcepts(budget));
+}
+
+export function sumBudgetPlannedAmounts(budgets: Budget[]) {
+  return budgets.reduce(
+    (total, budget) => total + calculateBudgetPlannedAmount(budget),
+    0,
+  );
 }
 
 export function createBudgetWeekOptions(monthInput: string) {

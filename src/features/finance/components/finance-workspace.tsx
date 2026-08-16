@@ -13,12 +13,15 @@ import {
   createSeedExpenses,
 } from "../data";
 import {
+  calculateBudgetPlannedAmount,
   formatCurrency,
   formatDateRange,
+  getBudgetConcepts,
   getPeriodRange,
   isWithinPeriod,
   movePeriod,
   sortByDateDesc,
+  sumBudgetPlannedAmounts,
   sumExpenses,
 } from "../utils";
 import {
@@ -27,9 +30,11 @@ import {
   saveStoredBudgets,
   saveStoredExpenses,
 } from "../storage";
-import type { Budget, Expense, FinancePeriod } from "../types";
+import type { Budget, BudgetConcept, Expense, FinancePeriod } from "../types";
+import { BudgetDetail } from "./budget-detail";
 import { BudgetForm } from "./budget-form";
 import { BudgetList } from "./budget-list";
+import { ConceptForm } from "./concept-form";
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 import { ExpenseDetail } from "./expense-detail";
 import { ExpenseForm } from "./expense-form";
@@ -51,11 +56,13 @@ export function FinanceWorkspace() {
   const [hasLoadedStoredBudgets, setHasLoadedStoredBudgets] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isAddBudgetOpen, setIsAddBudgetOpen] = useState(false);
+  const [isAddConceptOpen, setIsAddConceptOpen] = useState(false);
   const [period, setPeriod] = useState<FinancePeriod>("Monthly");
   const [anchorDate, setAnchorDate] = useState(today);
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
     null,
   );
+  const [selectedBudgetId, setSelectedBudgetId] = useState<string | null>(null);
   const [expensePendingDelete, setExpensePendingDelete] =
     useState<Expense | null>(null);
 
@@ -87,6 +94,18 @@ export function FinanceWorkspace() {
     [periodExpenses, selectedExpenseId],
   );
   const activeSelectedExpenseId = selectedExpense?.id ?? null;
+  const selectedBudget = useMemo(
+    () =>
+      budgets.find((budget) => budget.id === selectedBudgetId) ??
+      budgets[0] ??
+      null,
+    [budgets, selectedBudgetId],
+  );
+  const activeSelectedBudgetId = selectedBudget?.id ?? null;
+  const totalPlannedAmount = useMemo(
+    () => sumBudgetPlannedAmounts(budgets),
+    [budgets],
+  );
 
   useEffect(() => {
     const storedExpenses = readStoredExpenses(seedExpenses);
@@ -133,7 +152,26 @@ export function FinanceWorkspace() {
 
   function handleAddBudget(budget: Budget) {
     setBudgets((currentBudgets) => [budget, ...currentBudgets]);
+    setSelectedBudgetId(budget.id);
     setIsAddBudgetOpen(false);
+  }
+
+  function handleAddConcept(concept: BudgetConcept) {
+    if (!selectedBudget) {
+      return;
+    }
+
+    setBudgets((currentBudgets) =>
+      currentBudgets.map((budget) =>
+        budget.id === selectedBudget.id
+          ? {
+              ...budget,
+              concepts: [...getBudgetConcepts(budget), concept],
+            }
+          : budget,
+      ),
+    );
+    setIsAddConceptOpen(false);
   }
 
   function handleConfirmDeleteExpense() {
@@ -252,16 +290,23 @@ export function FinanceWorkspace() {
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
             <BudgetList
               budgets={budgets}
+              selectedBudgetId={activeSelectedBudgetId}
               onAddBudget={() => setIsAddBudgetOpen(true)}
+              onSelectBudget={setSelectedBudgetId}
             />
 
             <aside className="min-w-0 space-y-6">
+              <BudgetDetail
+                budget={selectedBudget}
+                onAddConcept={() => setIsAddConceptOpen(true)}
+              />
+
               <Card>
                 <p className="text-[12px] leading-5 text-[var(--text-muted)]">
-                  Planned
+                  Total planned
                 </p>
                 <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
-                  {formatCurrency(0)}
+                  {formatCurrency(totalPlannedAmount)}
                 </p>
                 <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
                   {budgets.length} budgets in the selected view
@@ -270,13 +315,17 @@ export function FinanceWorkspace() {
 
               <Card>
                 <p className="text-[12px] leading-5 text-[var(--text-muted)]">
-                  Concepts
+                  Selected budget
                 </p>
                 <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
-                  0
+                  {selectedBudget
+                    ? formatCurrency(calculateBudgetPlannedAmount(selectedBudget))
+                    : formatCurrency(0)}
                 </p>
                 <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
-                  No planned expense concepts yet
+                  {selectedBudget
+                    ? `${getBudgetConcepts(selectedBudget).length} concepts`
+                    : "No budget selected"}
                 </p>
               </Card>
             </aside>
@@ -297,6 +346,14 @@ export function FinanceWorkspace() {
           today={today}
           onAddBudget={handleAddBudget}
           onCancel={() => setIsAddBudgetOpen(false)}
+        />
+      ) : null}
+
+      {activeFinanceView === "Budget" && selectedBudget && isAddConceptOpen ? (
+        <ConceptForm
+          budgetName={selectedBudget.name}
+          onAddConcept={handleAddConcept}
+          onCancel={() => setIsAddConceptOpen(false)}
         />
       ) : null}
 

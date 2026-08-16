@@ -5,10 +5,14 @@ import { BudgetRow } from "./budget-row";
 
 export function BudgetList({
   budgets,
+  selectedBudgetId,
   onAddBudget,
+  onSelectBudget,
 }: {
   budgets: Budget[];
+  selectedBudgetId: string | null;
   onAddBudget: () => void;
+  onSelectBudget: (budgetId: string) => void;
 }) {
   return (
     <Panel>
@@ -17,7 +21,12 @@ export function BudgetList({
       {budgets.length > 0 ? (
         <div className="mt-5 space-y-3">
           {budgets.map((budget) => (
-            <BudgetRow key={budget.id} budget={budget} />
+            <BudgetRow
+              key={budget.id}
+              budget={budget}
+              isSelected={selectedBudgetId === budget.id}
+              onSelect={() => onSelectBudget(budget.id)}
+            />
           ))}
         </div>
       ) : (

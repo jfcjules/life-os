@@ -15,8 +15,6 @@
   --accent-lilac: #a594c7;
   --accent-rose: #d69ba8;
   --accent-amber: #d5b276;
-  --font-azeret-mono: "Azeret Mono", "SFMono-Regular", Consolas,
-    "Liberation Mono", monospace;
 }
 
 @theme inline {
@@ -29,7 +27,14 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-azeret-mono), monospace;
+  font-family: var(
+    --font-azeret-mono,
+    "Azeret Mono",
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace
+  );
 }
 
 button,

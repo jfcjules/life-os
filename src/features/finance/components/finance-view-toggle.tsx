@@ -1,6 +1,6 @@
-export type FinanceView = "Expenses" | "Budget";
+export type FinanceView = "Expenses" | "Budget" | "Goals";
 
-const financeViews: FinanceView[] = ["Expenses", "Budget"];
+const financeViews: FinanceView[] = ["Expenses", "Budget", "Goals"];
 
 export function FinanceViewToggle({
   activeView,
@@ -11,7 +11,7 @@ export function FinanceViewToggle({
 }) {
   return (
     <div
-      className="grid rounded-[18px] bg-[var(--background-page)] p-1 max-sm:w-full max-sm:grid-cols-2 sm:inline-grid sm:grid-flow-col"
+      className="grid rounded-[18px] bg-[var(--background-page)] p-1 max-sm:w-full max-sm:grid-cols-3 sm:inline-grid sm:grid-flow-col"
       aria-label="Finance view"
     >
       {financeViews.map((view) => {

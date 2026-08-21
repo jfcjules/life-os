@@ -4,6 +4,9 @@ import type {
   Expense,
   FinanceFrequency,
   FinancePeriod,
+  Goal,
+  GoalPlannedItem,
+  GoalSaving,
   Income,
 } from "./types";
 
@@ -52,6 +55,14 @@ export function formatDateInput(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
+}
+
+export function createFinanceId(prefix: string) {
+  const randomValue =
+    globalThis.crypto?.randomUUID?.() ??
+    Math.random().toString(36).slice(2, 12);
+
+  return `${prefix}-${randomValue}`;
 }
 
 export function formatMonthInput(date: Date) {
@@ -131,6 +142,14 @@ export function getBudgetConcepts(budget: Budget) {
   return Array.isArray(budget.concepts) ? budget.concepts : [];
 }
 
+export function getGoalPlannedItems(goal: Goal) {
+  return Array.isArray(goal.plannedItems) ? goal.plannedItems : [];
+}
+
+export function getGoalSavings(goal: Goal) {
+  return Array.isArray(goal.savings) ? goal.savings : [];
+}
+
 export function sumBudgetConcepts(concepts: BudgetConcept[]) {
   return concepts.reduce((total, concept) => total + concept.amount, 0);
 }
@@ -197,6 +216,59 @@ export function calculateProgressPercent(spentAmount: number, plannedAmount: num
   }
 
   return Math.min((spentAmount / plannedAmount) * 100, 100);
+}
+
+export function sumGoalSavings(savings: GoalSaving[]) {
+  return savings.reduce((total, saving) => total + saving.amount, 0);
+}
+
+export function getGoalPlannedItemSavings(
+  savings: GoalSaving[],
+  plannedItemId: string,
+) {
+  return savings.filter((saving) => saving.plannedItemId === plannedItemId);
+}
+
+export function sumGoalPlannedAmount(plannedItems: GoalPlannedItem[]) {
+  return plannedItems.reduce(
+    (total, item) => total + (item.estimatedAmount ?? 0),
+    0,
+  );
+}
+
+export function getGoalLinkedExpenses(expenses: Expense[], goal: Goal) {
+  return expenses.filter((expense) => expense.goalId === goal.id);
+}
+
+export function sumGoalSpentAmount(expenses: Expense[], goal: Goal) {
+  return getGoalLinkedExpenses(expenses, goal).reduce(
+    (total, expense) => total + expense.amount,
+    0,
+  );
+}
+
+export function calculateGoalSummary(goal: Goal, expenses: Expense[]) {
+  const savings = getGoalSavings(goal);
+  const plannedItems = getGoalPlannedItems(goal);
+  const savedAmount = sumGoalSavings(savings);
+  const spentAmount = sumGoalSpentAmount(expenses, goal);
+  const availableAmount = savedAmount - spentAmount;
+  const remainingAmount =
+    goal.goalAmount === undefined ? undefined : goal.goalAmount - savedAmount;
+  const progressPercent =
+    goal.goalAmount === undefined
+      ? undefined
+      : calculateProgressPercent(savedAmount, goal.goalAmount);
+  const estimatedPlannedTotal = sumGoalPlannedAmount(plannedItems);
+
+  return {
+    availableAmount,
+    estimatedPlannedTotal,
+    progressPercent,
+    remainingAmount,
+    savedAmount,
+    spentAmount,
+  };
 }
 
 export function getProgressStatus(spentAmount: number, plannedAmount: number) {

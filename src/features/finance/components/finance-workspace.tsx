@@ -11,12 +11,15 @@ import {
 import {
   createSeedBudgets,
   createSeedExpenses,
+  createSeedGoals,
 } from "../data";
 import {
   calculateBudgetPlannedAmount,
+  calculateGoalSummary,
   formatCurrency,
   formatDateRange,
   getBudgetConcepts,
+  getGoalPlannedItems,
   getPeriodRange,
   isWithinPeriod,
   movePeriod,
@@ -29,10 +32,20 @@ import {
 import {
   readStoredBudgets,
   readStoredExpenses,
+  readStoredGoals,
   saveStoredBudgets,
   saveStoredExpenses,
+  saveStoredGoals,
 } from "../storage";
-import type { Budget, BudgetConcept, Expense, FinancePeriod } from "../types";
+import type {
+  Budget,
+  BudgetConcept,
+  Expense,
+  FinancePeriod,
+  Goal,
+  GoalPlannedItem,
+  GoalSaving,
+} from "../types";
 import { BudgetDetail } from "./budget-detail";
 import { BudgetForm } from "./budget-form";
 import { BudgetList } from "./budget-list";
@@ -45,26 +58,41 @@ import {
   FinanceViewToggle,
   type FinanceView,
 } from "./finance-view-toggle";
+import { GoalDetail } from "./goal-detail";
+import { GoalForm } from "./goal-form";
+import { GoalList } from "./goal-list";
+import { GoalPlannedItemForm } from "./goal-planned-item-form";
+import { GoalSavingForm } from "./goal-saving-form";
 
 export function FinanceWorkspace() {
   const today = useMemo(() => new Date(), []);
   const seedExpenses = useMemo(() => createSeedExpenses(today), [today]);
   const seedBudgets = useMemo(() => createSeedBudgets(), []);
+  const seedGoals = useMemo(() => createSeedGoals(), []);
   const [expenses, setExpenses] = useState(seedExpenses);
   const [budgets, setBudgets] = useState(seedBudgets);
+  const [goals, setGoals] = useState(seedGoals);
   const [activeFinanceView, setActiveFinanceView] =
     useState<FinanceView>("Expenses");
   const [hasLoadedStoredExpenses, setHasLoadedStoredExpenses] = useState(false);
   const [hasLoadedStoredBudgets, setHasLoadedStoredBudgets] = useState(false);
+  const [hasLoadedStoredGoals, setHasLoadedStoredGoals] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isAddBudgetOpen, setIsAddBudgetOpen] = useState(false);
+  const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
   const [isAddConceptOpen, setIsAddConceptOpen] = useState(false);
+  const [isAddPlannedItemOpen, setIsAddPlannedItemOpen] = useState(false);
+  const [isAddSavingOpen, setIsAddSavingOpen] = useState(false);
+  const [savingPlannedItemId, setSavingPlannedItemId] = useState<string | null>(
+    null,
+  );
   const [period, setPeriod] = useState<FinancePeriod>("Monthly");
   const [anchorDate, setAnchorDate] = useState(today);
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
     null,
   );
   const [selectedBudgetId, setSelectedBudgetId] = useState<string | null>(null);
+  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
   const [expensePendingDelete, setExpensePendingDelete] =
     useState<Expense | null>(null);
 
@@ -104,6 +132,14 @@ export function FinanceWorkspace() {
     [budgets, selectedBudgetId],
   );
   const activeSelectedBudgetId = selectedBudget?.id ?? null;
+  const selectedGoal = useMemo(
+    () =>
+      goals.find((goal) => goal.id === selectedGoalId) ??
+      goals[0] ??
+      null,
+    [goals, selectedGoalId],
+  );
+  const activeSelectedGoalId = selectedGoal?.id ?? null;
   const totalPlannedAmount = useMemo(
     () => sumBudgetPlannedAmounts(budgets),
     [budgets],
@@ -116,6 +152,39 @@ export function FinanceWorkspace() {
     () => (selectedBudget ? sumBudgetSpentAmount(expenses, selectedBudget) : 0),
     [expenses, selectedBudget],
   );
+  const totalGoalSavedAmount = useMemo(
+    () =>
+      goals.reduce(
+        (total, goal) =>
+          total + calculateGoalSummary(goal, expenses).savedAmount,
+        0,
+      ),
+    [expenses, goals],
+  );
+  const totalGoalAvailableAmount = useMemo(
+    () =>
+      goals.reduce(
+        (total, goal) =>
+          total + calculateGoalSummary(goal, expenses).availableAmount,
+        0,
+      ),
+    [expenses, goals],
+  );
+  const selectedGoalSummary = useMemo(
+    () => (selectedGoal ? calculateGoalSummary(selectedGoal, expenses) : null),
+    [expenses, selectedGoal],
+  );
+  const selectedSavingPlannedItem = useMemo(() => {
+    if (!selectedGoal || !savingPlannedItemId) {
+      return null;
+    }
+
+    return (
+      getGoalPlannedItems(selectedGoal).find(
+        (item) => item.id === savingPlannedItemId,
+      ) ?? null
+    );
+  }, [savingPlannedItemId, selectedGoal]);
 
   useEffect(() => {
     const storedExpenses = readStoredExpenses(seedExpenses);
@@ -136,6 +205,15 @@ export function FinanceWorkspace() {
   }, [seedBudgets]);
 
   useEffect(() => {
+    const storedGoals = readStoredGoals(seedGoals);
+
+    window.queueMicrotask(() => {
+      setGoals(storedGoals);
+      setHasLoadedStoredGoals(true);
+    });
+  }, [seedGoals]);
+
+  useEffect(() => {
     if (!hasLoadedStoredExpenses) {
       return;
     }
@@ -151,6 +229,14 @@ export function FinanceWorkspace() {
     saveStoredBudgets(budgets);
   }, [budgets, hasLoadedStoredBudgets]);
 
+  useEffect(() => {
+    if (!hasLoadedStoredGoals) {
+      return;
+    }
+
+    saveStoredGoals(goals);
+  }, [goals, hasLoadedStoredGoals]);
+
   function handleAddExpense(expense: Expense) {
     setExpenses((currentExpenses) =>
       sortByDateDesc([expense, ...currentExpenses]),
@@ -164,6 +250,13 @@ export function FinanceWorkspace() {
     setBudgets((currentBudgets) => [budget, ...currentBudgets]);
     setSelectedBudgetId(budget.id);
     setIsAddBudgetOpen(false);
+  }
+
+  function handleAddGoal(goal: Goal) {
+    setGoals((currentGoals) => [goal, ...currentGoals]);
+    setSelectedGoalId(goal.id);
+    setActiveFinanceView("Goals");
+    setIsAddGoalOpen(false);
   }
 
   function handleAddConcept(concept: BudgetConcept) {
@@ -182,6 +275,61 @@ export function FinanceWorkspace() {
       ),
     );
     setIsAddConceptOpen(false);
+  }
+
+  function handleAddPlannedItem(plannedItem: GoalPlannedItem) {
+    if (!selectedGoal) {
+      return;
+    }
+
+    setGoals((currentGoals) =>
+      currentGoals.map((goal) =>
+        goal.id === selectedGoal.id
+          ? {
+              ...goal,
+              plannedItems: [...getGoalPlannedItems(goal), plannedItem],
+            }
+          : goal,
+      ),
+    );
+    setIsAddPlannedItemOpen(false);
+  }
+
+  function handleAddSaving(saving: GoalSaving) {
+    if (!selectedGoal) {
+      return;
+    }
+
+    setGoals((currentGoals) =>
+      currentGoals.map((goal) =>
+        goal.id === selectedGoal.id
+          ? {
+              ...goal,
+              savings: [...goal.savings, saving],
+            }
+          : goal,
+      ),
+    );
+    setIsAddSavingOpen(false);
+    setSavingPlannedItemId(null);
+  }
+
+  function handleOpenGoalSaving(goalId: string, plannedItemId?: string) {
+    setSelectedGoalId(goalId);
+    setSavingPlannedItemId(plannedItemId ?? null);
+    setIsAddSavingOpen(true);
+  }
+
+  function handleCompleteGoal() {
+    if (!selectedGoal) {
+      return;
+    }
+
+    setGoals((currentGoals) =>
+      currentGoals.map((goal) =>
+        goal.id === selectedGoal.id ? { ...goal, status: "Completed" } : goal,
+      ),
+    );
   }
 
   function handleConfirmDeleteExpense() {
@@ -234,10 +382,12 @@ export function FinanceWorkspace() {
               <Button onClick={() => setIsAddExpenseOpen(true)}>
                 Add expense
               </Button>
-            ) : (
+            ) : activeFinanceView === "Budget" ? (
               <Button onClick={() => setIsAddBudgetOpen(true)}>
                 Add budget
               </Button>
+            ) : (
+              <Button onClick={() => setIsAddGoalOpen(true)}>Add goal</Button>
             )}
           </div>
         </header>
@@ -296,7 +446,7 @@ export function FinanceWorkspace() {
               </Card>
             </aside>
           </div>
-        ) : (
+        ) : activeFinanceView === "Budget" ? (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
             <BudgetList
               budgets={budgets}
@@ -344,12 +494,69 @@ export function FinanceWorkspace() {
               </Card>
             </aside>
           </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
+            <GoalList
+              expenses={expenses}
+              goals={goals}
+              selectedGoalId={activeSelectedGoalId}
+              onAddSavingForPlannedItem={handleOpenGoalSaving}
+              onAddGoal={() => setIsAddGoalOpen(true)}
+              onSelectGoal={setSelectedGoalId}
+            />
+
+            <aside className="min-w-0 space-y-6">
+              <GoalDetail
+                expenses={expenses}
+                goal={selectedGoal}
+                onAddPlannedItem={() => setIsAddPlannedItemOpen(true)}
+                onAddSaving={() => {
+                  if (selectedGoal) {
+                    handleOpenGoalSaving(selectedGoal.id);
+                  }
+                }}
+                onCompleteGoal={handleCompleteGoal}
+              />
+
+              <Card>
+                <p className="text-[12px] leading-5 text-[var(--text-muted)]">
+                  Total saved for goals
+                </p>
+                <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
+                  {formatCurrency(totalGoalSavedAmount)}
+                </p>
+                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+                  {formatCurrency(totalGoalAvailableAmount)} available across{" "}
+                  {goals.length} goals
+                </p>
+              </Card>
+
+              <Card>
+                <p className="text-[12px] leading-5 text-[var(--text-muted)]">
+                  Selected goal
+                </p>
+                <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
+                  {selectedGoalSummary
+                    ? formatCurrency(selectedGoalSummary.availableAmount)
+                    : formatCurrency(0)}
+                </p>
+                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+                  {selectedGoal
+                    ? `${formatCurrency(
+                        selectedGoalSummary?.spentAmount ?? 0,
+                      )} spent for ${selectedGoal.name}`
+                    : "No goal selected"}
+                </p>
+              </Card>
+            </aside>
+          </div>
         )}
       </div>
 
       {activeFinanceView === "Expenses" && isAddExpenseOpen ? (
         <ExpenseForm
           budgets={budgets}
+          goals={goals}
           today={today}
           onAddExpense={handleAddExpense}
           onCancel={() => setIsAddExpenseOpen(false)}
@@ -369,6 +576,35 @@ export function FinanceWorkspace() {
           budgetName={selectedBudget.name}
           onAddConcept={handleAddConcept}
           onCancel={() => setIsAddConceptOpen(false)}
+        />
+      ) : null}
+
+      {activeFinanceView === "Goals" && isAddGoalOpen ? (
+        <GoalForm
+          onAddGoal={handleAddGoal}
+          onCancel={() => setIsAddGoalOpen(false)}
+        />
+      ) : null}
+
+      {activeFinanceView === "Goals" && selectedGoal && isAddPlannedItemOpen ? (
+        <GoalPlannedItemForm
+          goalName={selectedGoal.name}
+          onAddPlannedItem={handleAddPlannedItem}
+          onCancel={() => setIsAddPlannedItemOpen(false)}
+        />
+      ) : null}
+
+      {activeFinanceView === "Goals" && selectedGoal && isAddSavingOpen ? (
+        <GoalSavingForm
+          goalName={selectedGoal.name}
+          plannedItemId={savingPlannedItemId ?? undefined}
+          plannedItemName={selectedSavingPlannedItem?.concept}
+          today={today}
+          onAddSaving={handleAddSaving}
+          onCancel={() => {
+            setIsAddSavingOpen(false);
+            setSavingPlannedItemId(null);
+          }}
         />
       ) : null}
 

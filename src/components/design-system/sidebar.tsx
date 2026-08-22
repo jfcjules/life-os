@@ -5,7 +5,15 @@ export const primaryNavigation: NavigationItem[] = [
   { label: "Home", href: "/" },
   { label: "Calendar", href: "/calendar" },
   { label: "Reminders", href: "/reminders" },
-  { label: "Finance", href: "/finance" },
+  {
+    label: "Finance",
+    href: "/finance/expenses",
+    subItems: [
+      { label: "Expenses", href: "/finance/expenses" },
+      { label: "Budget", href: "/finance/budget" },
+      { label: "Goals", href: "/finance/goals" },
+    ],
+  },
   { label: "Groceries", href: "/groceries" },
   { label: "Chores", href: "/chores" },
   { label: "Settings", href: "/settings" },
@@ -13,9 +21,11 @@ export const primaryNavigation: NavigationItem[] = [
 
 export function Sidebar({
   activeItem = "Home",
+  activeSubItem,
   navigationItems = primaryNavigation,
 }: {
   activeItem?: string;
+  activeSubItem?: string;
   navigationItems?: NavigationItem[];
 }) {
   return (
@@ -51,21 +61,52 @@ export function Sidebar({
         <nav className="mt-8 space-y-2" aria-label="Primary navigation">
           {navigationItems.map((item) => {
             const isActive = item.label === activeItem;
+            const hasSubItems = Boolean(item.subItems?.length);
 
             return (
-              <Link
-                key={item.label}
-                href={item.href}
-                aria-current={isActive ? "page" : undefined}
-                className={`flex min-h-11 items-center justify-between rounded-[16px] px-4 text-[12px] leading-5 ${
-                  isActive
-                    ? "bg-[var(--surface-raised)] font-medium shadow-[0_10px_24px_rgba(8,17,32,0.05)]"
-                    : "text-[var(--text-muted)]"
-                }`}
-              >
-                <span>{item.label}</span>
-                {isActive ? <span aria-hidden="true">.</span> : null}
-              </Link>
+              <div key={item.label}>
+                <Link
+                  href={item.href}
+                  aria-current={isActive && !activeSubItem ? "page" : undefined}
+                  className={`flex min-h-11 items-center justify-between rounded-[16px] px-4 text-[12px] leading-5 ${
+                    isActive
+                      ? "bg-[var(--surface-raised)] font-medium shadow-[0_10px_24px_rgba(8,17,32,0.05)]"
+                      : "text-[var(--text-muted)]"
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {isActive && !hasSubItems ? (
+                    <span aria-hidden="true">.</span>
+                  ) : null}
+                </Link>
+
+                {hasSubItems ? (
+                  <div className="mt-2 space-y-1 pl-4">
+                    {item.subItems?.map((subItem) => {
+                      const isSubItemActive =
+                        isActive && subItem.label === activeSubItem;
+
+                      return (
+                        <Link
+                          key={subItem.label}
+                          href={subItem.href}
+                          aria-current={isSubItemActive ? "page" : undefined}
+                          className={`flex min-h-9 items-center justify-between rounded-[14px] px-4 text-[11px] leading-4 transition ${
+                            isSubItemActive
+                              ? "bg-[rgba(207,217,242,0.72)] font-medium text-[var(--text-primary)]"
+                              : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                          }`}
+                        >
+                          <span>{subItem.label}</span>
+                          {isSubItemActive ? (
+                            <span aria-hidden="true">.</span>
+                          ) : null}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
             );
           })}
         </nav>

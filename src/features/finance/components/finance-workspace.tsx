@@ -54,17 +54,19 @@ import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 import { ExpenseDetail } from "./expense-detail";
 import { ExpenseForm } from "./expense-form";
 import { ExpenseHistory } from "./expense-history";
-import {
-  FinanceViewToggle,
-  type FinanceView,
-} from "./finance-view-toggle";
 import { GoalDetail } from "./goal-detail";
 import { GoalForm } from "./goal-form";
 import { GoalList } from "./goal-list";
 import { GoalPlannedItemForm } from "./goal-planned-item-form";
 import { GoalSavingForm } from "./goal-saving-form";
 
-export function FinanceWorkspace() {
+export type FinanceSection = "Expenses" | "Budget" | "Goals";
+
+export function FinanceWorkspace({
+  activeSection = "Expenses",
+}: {
+  activeSection?: FinanceSection;
+}) {
   const today = useMemo(() => new Date(), []);
   const seedExpenses = useMemo(() => createSeedExpenses(today), [today]);
   const seedBudgets = useMemo(() => createSeedBudgets(), []);
@@ -72,8 +74,6 @@ export function FinanceWorkspace() {
   const [expenses, setExpenses] = useState(seedExpenses);
   const [budgets, setBudgets] = useState(seedBudgets);
   const [goals, setGoals] = useState(seedGoals);
-  const [activeFinanceView, setActiveFinanceView] =
-    useState<FinanceView>("Expenses");
   const [hasLoadedStoredExpenses, setHasLoadedStoredExpenses] = useState(false);
   const [hasLoadedStoredBudgets, setHasLoadedStoredBudgets] = useState(false);
   const [hasLoadedStoredGoals, setHasLoadedStoredGoals] = useState(false);
@@ -255,7 +255,6 @@ export function FinanceWorkspace() {
   function handleAddGoal(goal: Goal) {
     setGoals((currentGoals) => [goal, ...currentGoals]);
     setSelectedGoalId(goal.id);
-    setActiveFinanceView("Goals");
     setIsAddGoalOpen(false);
   }
 
@@ -361,7 +360,7 @@ export function FinanceWorkspace() {
   }
 
   return (
-    <AppShell activeItem="Finance">
+    <AppShell activeItem="Finance" activeSubItem={activeSection}>
       <div className="flex min-h-full flex-col gap-8">
         <header className="flex items-start justify-between gap-6 max-md:flex-col">
           <div className="max-w-[700px]">
@@ -378,26 +377,23 @@ export function FinanceWorkspace() {
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-3 max-md:justify-start">
-            {activeFinanceView === "Expenses" ? (
+            {activeSection === "Expenses" ? (
               <Button onClick={() => setIsAddExpenseOpen(true)}>
                 Add expense
               </Button>
-            ) : activeFinanceView === "Budget" ? (
+            ) : null}
+            {activeSection === "Budget" ? (
               <Button onClick={() => setIsAddBudgetOpen(true)}>
                 Add budget
               </Button>
-            ) : (
+            ) : null}
+            {activeSection === "Goals" ? (
               <Button onClick={() => setIsAddGoalOpen(true)}>Add goal</Button>
-            )}
+            ) : null}
           </div>
         </header>
 
-        <FinanceViewToggle
-          activeView={activeFinanceView}
-          onSelectView={setActiveFinanceView}
-        />
-
-        {activeFinanceView === "Expenses" ? (
+        {activeSection === "Expenses" ? (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
             <ExpenseHistory
               expenses={periodExpenses}
@@ -446,7 +442,9 @@ export function FinanceWorkspace() {
               </Card>
             </aside>
           </div>
-        ) : activeFinanceView === "Budget" ? (
+        ) : null}
+
+        {activeSection === "Budget" ? (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
             <BudgetList
               budgets={budgets}
@@ -494,7 +492,9 @@ export function FinanceWorkspace() {
               </Card>
             </aside>
           </div>
-        ) : (
+        ) : null}
+
+        {activeSection === "Goals" ? (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
             <GoalList
               expenses={expenses}
@@ -550,10 +550,10 @@ export function FinanceWorkspace() {
               </Card>
             </aside>
           </div>
-        )}
+        ) : null}
       </div>
 
-      {activeFinanceView === "Expenses" && isAddExpenseOpen ? (
+      {activeSection === "Expenses" && isAddExpenseOpen ? (
         <ExpenseForm
           budgets={budgets}
           goals={goals}
@@ -563,7 +563,7 @@ export function FinanceWorkspace() {
         />
       ) : null}
 
-      {activeFinanceView === "Budget" && isAddBudgetOpen ? (
+      {activeSection === "Budget" && isAddBudgetOpen ? (
         <BudgetForm
           today={today}
           onAddBudget={handleAddBudget}
@@ -571,7 +571,7 @@ export function FinanceWorkspace() {
         />
       ) : null}
 
-      {activeFinanceView === "Budget" && selectedBudget && isAddConceptOpen ? (
+      {activeSection === "Budget" && selectedBudget && isAddConceptOpen ? (
         <ConceptForm
           budgetName={selectedBudget.name}
           onAddConcept={handleAddConcept}
@@ -579,14 +579,14 @@ export function FinanceWorkspace() {
         />
       ) : null}
 
-      {activeFinanceView === "Goals" && isAddGoalOpen ? (
+      {activeSection === "Goals" && isAddGoalOpen ? (
         <GoalForm
           onAddGoal={handleAddGoal}
           onCancel={() => setIsAddGoalOpen(false)}
         />
       ) : null}
 
-      {activeFinanceView === "Goals" && selectedGoal && isAddPlannedItemOpen ? (
+      {activeSection === "Goals" && selectedGoal && isAddPlannedItemOpen ? (
         <GoalPlannedItemForm
           goalName={selectedGoal.name}
           onAddPlannedItem={handleAddPlannedItem}
@@ -594,7 +594,7 @@ export function FinanceWorkspace() {
         />
       ) : null}
 
-      {activeFinanceView === "Goals" && selectedGoal && isAddSavingOpen ? (
+      {activeSection === "Goals" && selectedGoal && isAddSavingOpen ? (
         <GoalSavingForm
           goalName={selectedGoal.name}
           plannedItemId={savingPlannedItemId ?? undefined}

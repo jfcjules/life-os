@@ -12,6 +12,7 @@ import {
   createSeedBudgets,
   createSeedExpenses,
   createSeedGoals,
+  createSeedIncome,
 } from "../data";
 import {
   calculateBudgetPlannedAmount,
@@ -28,14 +29,17 @@ import {
   sumBudgetsSpentAmount,
   sumBudgetPlannedAmounts,
   sumExpenses,
+  sumIncome,
 } from "../utils";
 import {
   readStoredBudgets,
   readStoredExpenses,
   readStoredGoals,
+  readStoredIncome,
   saveStoredBudgets,
   saveStoredExpenses,
   saveStoredGoals,
+  saveStoredIncome,
 } from "../storage";
 import type {
   Budget,
@@ -45,6 +49,7 @@ import type {
   Goal,
   GoalPlannedItem,
   GoalSaving,
+  Income,
 } from "../types";
 import { BudgetDetail } from "./budget-detail";
 import { BudgetForm } from "./budget-form";
@@ -59,8 +64,11 @@ import { GoalForm } from "./goal-form";
 import { GoalList } from "./goal-list";
 import { GoalPlannedItemForm } from "./goal-planned-item-form";
 import { GoalSavingForm } from "./goal-saving-form";
+import { IncomeDetail } from "./income-detail";
+import { IncomeForm } from "./income-form";
+import { IncomeHistory } from "./income-history";
 
-export type FinanceSection = "Expenses" | "Budget" | "Goals";
+export type FinanceSection = "Expenses" | "Income" | "Budget" | "Goals";
 
 export function FinanceWorkspace({
   activeSection = "Expenses",
@@ -69,15 +77,19 @@ export function FinanceWorkspace({
 }) {
   const today = useMemo(() => new Date(), []);
   const seedExpenses = useMemo(() => createSeedExpenses(today), [today]);
+  const seedIncome = useMemo(() => createSeedIncome(), []);
   const seedBudgets = useMemo(() => createSeedBudgets(), []);
   const seedGoals = useMemo(() => createSeedGoals(), []);
   const [expenses, setExpenses] = useState(seedExpenses);
+  const [income, setIncome] = useState(seedIncome);
   const [budgets, setBudgets] = useState(seedBudgets);
   const [goals, setGoals] = useState(seedGoals);
   const [hasLoadedStoredExpenses, setHasLoadedStoredExpenses] = useState(false);
+  const [hasLoadedStoredIncome, setHasLoadedStoredIncome] = useState(false);
   const [hasLoadedStoredBudgets, setHasLoadedStoredBudgets] = useState(false);
   const [hasLoadedStoredGoals, setHasLoadedStoredGoals] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+  const [isIncomeFormOpen, setIsIncomeFormOpen] = useState(false);
   const [isAddBudgetOpen, setIsAddBudgetOpen] = useState(false);
   const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
   const [isAddConceptOpen, setIsAddConceptOpen] = useState(false);
@@ -91,10 +103,14 @@ export function FinanceWorkspace({
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
     null,
   );
+  const [selectedIncomeId, setSelectedIncomeId] = useState<string | null>(null);
+  const [editingIncomeId, setEditingIncomeId] = useState<string | null>(null);
   const [selectedBudgetId, setSelectedBudgetId] = useState<string | null>(null);
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
   const [expensePendingDelete, setExpensePendingDelete] =
     useState<Expense | null>(null);
+  const [incomePendingDelete, setIncomePendingDelete] =
+    useState<Income | null>(null);
 
   const periodRange = useMemo(
     () => getPeriodRange(period, anchorDate),
@@ -115,6 +131,15 @@ export function FinanceWorkspace({
     () => sumExpenses(periodExpenses),
     [periodExpenses],
   );
+  const periodIncome = useMemo(() => {
+    return sortByDateDesc(
+      income.filter((incomeItem) => isWithinPeriod(incomeItem.date, periodRange)),
+    );
+  }, [income, periodRange]);
+  const periodIncomeTotal = useMemo(
+    () => sumIncome(periodIncome),
+    [periodIncome],
+  );
 
   const selectedExpense = useMemo(
     () =>
@@ -124,6 +149,18 @@ export function FinanceWorkspace({
     [periodExpenses, selectedExpenseId],
   );
   const activeSelectedExpenseId = selectedExpense?.id ?? null;
+  const selectedIncome = useMemo(
+    () =>
+      periodIncome.find((incomeItem) => incomeItem.id === selectedIncomeId) ??
+      periodIncome[0] ??
+      null,
+    [periodIncome, selectedIncomeId],
+  );
+  const activeSelectedIncomeId = selectedIncome?.id ?? null;
+  const editingIncome = useMemo(
+    () => income.find((incomeItem) => incomeItem.id === editingIncomeId) ?? null,
+    [editingIncomeId, income],
+  );
   const selectedBudget = useMemo(
     () =>
       budgets.find((budget) => budget.id === selectedBudgetId) ??
@@ -196,6 +233,15 @@ export function FinanceWorkspace({
   }, [seedExpenses]);
 
   useEffect(() => {
+    const storedIncome = readStoredIncome(seedIncome);
+
+    window.queueMicrotask(() => {
+      setIncome(storedIncome);
+      setHasLoadedStoredIncome(true);
+    });
+  }, [seedIncome]);
+
+  useEffect(() => {
     const storedBudgets = readStoredBudgets(seedBudgets);
 
     window.queueMicrotask(() => {
@@ -222,6 +268,14 @@ export function FinanceWorkspace({
   }, [expenses, hasLoadedStoredExpenses]);
 
   useEffect(() => {
+    if (!hasLoadedStoredIncome) {
+      return;
+    }
+
+    saveStoredIncome(income);
+  }, [income, hasLoadedStoredIncome]);
+
+  useEffect(() => {
     if (!hasLoadedStoredBudgets) {
       return;
     }
@@ -244,6 +298,41 @@ export function FinanceWorkspace({
     setSelectedExpenseId(expense.id);
     setAnchorDate(new Date(`${expense.date}T00:00:00`));
     setIsAddExpenseOpen(false);
+  }
+
+  function handleOpenAddIncome() {
+    setEditingIncomeId(null);
+    setIsIncomeFormOpen(true);
+  }
+
+  function handleEditIncome(incomeItem: Income) {
+    setSelectedIncomeId(incomeItem.id);
+    setEditingIncomeId(incomeItem.id);
+    setIsIncomeFormOpen(true);
+  }
+
+  function handleSaveIncome(incomeItem: Income) {
+    setIncome((currentIncome) => {
+      const hasExistingIncome = currentIncome.some(
+        (currentIncomeItem) => currentIncomeItem.id === incomeItem.id,
+      );
+
+      if (hasExistingIncome) {
+        return sortByDateDesc(
+          currentIncome.map((currentIncomeItem) =>
+            currentIncomeItem.id === incomeItem.id
+              ? incomeItem
+              : currentIncomeItem,
+          ),
+        );
+      }
+
+      return sortByDateDesc([incomeItem, ...currentIncome]);
+    });
+    setSelectedIncomeId(incomeItem.id);
+    setAnchorDate(new Date(`${incomeItem.date}T00:00:00`));
+    setEditingIncomeId(null);
+    setIsIncomeFormOpen(false);
   }
 
   function handleAddBudget(budget: Budget) {
@@ -349,6 +438,29 @@ export function FinanceWorkspace({
     setExpensePendingDelete(null);
   }
 
+  function handleConfirmDeleteIncome() {
+    if (!incomePendingDelete) {
+      return;
+    }
+
+    setIncome((currentIncome) =>
+      currentIncome.filter(
+        (incomeItem) => incomeItem.id !== incomePendingDelete.id,
+      ),
+    );
+    setSelectedIncomeId((currentSelectedIncomeId) =>
+      currentSelectedIncomeId === incomePendingDelete.id
+        ? null
+        : currentSelectedIncomeId,
+    );
+    setEditingIncomeId((currentEditingIncomeId) =>
+      currentEditingIncomeId === incomePendingDelete.id
+        ? null
+        : currentEditingIncomeId,
+    );
+    setIncomePendingDelete(null);
+  }
+
   function handleChangePeriod(nextPeriod: FinancePeriod) {
     setPeriod(nextPeriod);
   }
@@ -371,7 +483,7 @@ export function FinanceWorkspace({
               Finance
             </h1>
             <p className="mt-5 max-w-[560px] text-[13px] leading-6 text-[var(--text-muted)]">
-              Record everyday spending and keep budget planning in the same
+              Record money in and out, then keep budget planning in the same
               quiet Finance space.
             </p>
           </div>
@@ -381,6 +493,9 @@ export function FinanceWorkspace({
               <Button onClick={() => setIsAddExpenseOpen(true)}>
                 Add expense
               </Button>
+            ) : null}
+            {activeSection === "Income" ? (
+              <Button onClick={handleOpenAddIncome}>Add income</Button>
             ) : null}
             {activeSection === "Budget" ? (
               <Button onClick={() => setIsAddBudgetOpen(true)}>
@@ -437,6 +552,70 @@ export function FinanceWorkspace({
                     onClick={() => setIsAddExpenseOpen(true)}
                   >
                     Add expense
+                  </Button>
+                </div>
+              </Card>
+            </aside>
+          </div>
+        ) : null}
+
+        {activeSection === "Income" ? (
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
+            <IncomeHistory
+              income={periodIncome}
+              period={period}
+              rangeLabel={periodRangeLabel}
+              total={periodIncomeTotal}
+              selectedIncomeId={activeSelectedIncomeId}
+              onAddIncome={handleOpenAddIncome}
+              onChangePeriod={handleChangePeriod}
+              onEditIncome={handleEditIncome}
+              onMovePeriod={handleMovePeriod}
+              onRemoveIncome={setIncomePendingDelete}
+              onSelectIncome={setSelectedIncomeId}
+            />
+
+            <aside className="min-w-0 space-y-6">
+              <Card>
+                <p className="text-[12px] leading-5 text-[var(--text-muted)]">
+                  Period income
+                </p>
+                <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
+                  {formatCurrency(periodIncomeTotal)}
+                </p>
+                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+                  {periodIncome.length} income entries in the selected period
+                </p>
+              </Card>
+
+              <IncomeDetail
+                income={selectedIncome}
+                onEdit={() => {
+                  if (selectedIncome) {
+                    handleEditIncome(selectedIncome);
+                  }
+                }}
+                onRemove={() => {
+                  if (selectedIncome) {
+                    setIncomePendingDelete(selectedIncome);
+                  }
+                }}
+              />
+
+              <Card>
+                <p className="text-[12px] font-medium leading-5">
+                  Quick action
+                </p>
+                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+                  Capture income when money arrives.
+                </p>
+                <div className="mt-5">
+                  <Button
+                    variant="secondary"
+                    className="w-full"
+                    onClick={handleOpenAddIncome}
+                  >
+                    Add income
                   </Button>
                 </div>
               </Card>
@@ -563,6 +742,18 @@ export function FinanceWorkspace({
         />
       ) : null}
 
+      {activeSection === "Income" && isIncomeFormOpen ? (
+        <IncomeForm
+          income={editingIncome ?? undefined}
+          today={today}
+          onCancel={() => {
+            setIsIncomeFormOpen(false);
+            setEditingIncomeId(null);
+          }}
+          onSaveIncome={handleSaveIncome}
+        />
+      ) : null}
+
       {activeSection === "Budget" && isAddBudgetOpen ? (
         <BudgetForm
           today={today}
@@ -610,9 +801,18 @@ export function FinanceWorkspace({
 
       {expensePendingDelete ? (
         <ConfirmDeleteDialog
-          expenseName={expensePendingDelete.name}
+          itemName={expensePendingDelete.name}
           onCancel={() => setExpensePendingDelete(null)}
           onConfirm={handleConfirmDeleteExpense}
+        />
+      ) : null}
+
+      {incomePendingDelete ? (
+        <ConfirmDeleteDialog
+          itemName={incomePendingDelete.name}
+          itemType="income"
+          onCancel={() => setIncomePendingDelete(null)}
+          onConfirm={handleConfirmDeleteIncome}
         />
       ) : null}
     </AppShell>

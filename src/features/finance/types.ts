@@ -84,5 +84,6 @@ export type Income = {
   date: string;
   category?: string;
   frequency?: FinanceFrequency;
+  label?: string;
   tagIds: string[];
 };

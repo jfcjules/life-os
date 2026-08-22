@@ -7,8 +7,9 @@ export const primaryNavigation: NavigationItem[] = [
   { label: "Reminders", href: "/reminders" },
   {
     label: "Finance",
-    href: "/finance/expenses",
+    href: "/finance/overview",
     subItems: [
+      { label: "Overview", href: "/finance/overview" },
       { label: "Expenses", href: "/finance/expenses" },
       { label: "Income", href: "/finance/income" },
       { label: "Budget", href: "/finance/budget" },

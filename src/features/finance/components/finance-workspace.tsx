@@ -25,6 +25,7 @@ import {
   isWithinPeriod,
   movePeriod,
   sortByDateDesc,
+  calculateNetSavings,
   sumBudgetSpentAmount,
   sumBudgetsSpentAmount,
   sumBudgetPlannedAmounts,
@@ -59,6 +60,7 @@ import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 import { ExpenseDetail } from "./expense-detail";
 import { ExpenseForm } from "./expense-form";
 import { ExpenseHistory } from "./expense-history";
+import { FinanceOverview } from "./finance-overview";
 import { GoalDetail } from "./goal-detail";
 import { GoalForm } from "./goal-form";
 import { GoalList } from "./goal-list";
@@ -68,10 +70,15 @@ import { IncomeDetail } from "./income-detail";
 import { IncomeForm } from "./income-form";
 import { IncomeHistory } from "./income-history";
 
-export type FinanceSection = "Expenses" | "Income" | "Budget" | "Goals";
+export type FinanceSection =
+  | "Overview"
+  | "Expenses"
+  | "Income"
+  | "Budget"
+  | "Goals";
 
 export function FinanceWorkspace({
-  activeSection = "Expenses",
+  activeSection = "Overview",
 }: {
   activeSection?: FinanceSection;
 }) {
@@ -139,6 +146,10 @@ export function FinanceWorkspace({
   const periodIncomeTotal = useMemo(
     () => sumIncome(periodIncome),
     [periodIncome],
+  );
+  const periodNetSavings = useMemo(
+    () => calculateNetSavings(periodIncomeTotal, periodTotal),
+    [periodIncomeTotal, periodTotal],
   );
 
   const selectedExpense = useMemo(
@@ -507,6 +518,20 @@ export function FinanceWorkspace({
             ) : null}
           </div>
         </header>
+
+        {activeSection === "Overview" ? (
+          <FinanceOverview
+            expenses={periodExpenses}
+            income={periodIncome}
+            expenseTotal={periodTotal}
+            incomeTotal={periodIncomeTotal}
+            netSavings={periodNetSavings}
+            period={period}
+            rangeLabel={periodRangeLabel}
+            onChangePeriod={handleChangePeriod}
+            onMovePeriod={handleMovePeriod}
+          />
+        ) : null}
 
         {activeSection === "Expenses" ? (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">

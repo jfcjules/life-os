@@ -28,6 +28,8 @@ export type Expense = {
   assignedUserId?: string;
   dueDate?: string;
   frequency: FinanceFrequency;
+  goalId?: string;
+  goalPlannedItemId?: string;
   tagIds: string[];
 };
 
@@ -45,6 +47,33 @@ export type Budget = {
   halfMonth?: "first-half" | "second-half";
   week?: "week-1" | "week-2" | "week-3" | "week-4" | "week-5";
   concepts: BudgetConcept[];
+  createdAt: string;
+};
+
+export type GoalStatus = "Active" | "Completed";
+
+export type GoalPlannedItem = {
+  id: string;
+  concept: string;
+  estimatedAmount?: number;
+};
+
+export type GoalSaving = {
+  id: string;
+  concept?: string;
+  amount: number;
+  date: string;
+  plannedItemId?: string;
+};
+
+export type Goal = {
+  id: string;
+  name: string;
+  goalAmount?: number;
+  targetDate?: string;
+  status: GoalStatus;
+  plannedItems: GoalPlannedItem[];
+  savings: GoalSaving[];
   createdAt: string;
 };
 

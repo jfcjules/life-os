@@ -1,8 +1,9 @@
-import type { Budget, Expense, FinanceTag, Income } from "./types";
+import type { Budget, Expense, FinanceTag, Goal, Income } from "./types";
 
 const financeStorageKeys = {
   expenses: "life-os.finance.expenses",
   budgets: "life-os.finance.budgets",
+  goals: "life-os.finance.goals",
   income: "life-os.finance.income",
   tags: "life-os.finance.tags",
 };
@@ -21,6 +22,14 @@ export function readStoredBudgets(fallback: Budget[]) {
 
 export function saveStoredBudgets(budgets: Budget[]) {
   saveStoredArray(financeStorageKeys.budgets, budgets);
+}
+
+export function readStoredGoals(fallback: Goal[]) {
+  return readStoredArray<Goal>(financeStorageKeys.goals, fallback);
+}
+
+export function saveStoredGoals(goals: Goal[]) {
+  saveStoredArray(financeStorageKeys.goals, goals);
 }
 
 export function readStoredIncome(fallback: Income[]) {

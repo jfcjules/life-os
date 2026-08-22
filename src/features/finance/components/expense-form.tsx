@@ -3,8 +3,9 @@ import { useMemo, useState } from "react";
 
 import { Button } from "@/components/design-system";
 
-import type { Budget, Expense } from "../types";
+import type { Budget, Expense, Goal } from "../types";
 import {
+  createFinanceId,
   findBudgetForDate,
   formatDateInput,
   getBudgetConcepts,
@@ -15,11 +16,13 @@ const fieldClass =
 
 export function ExpenseForm({
   budgets,
+  goals,
   today,
   onAddExpense,
   onCancel,
 }: {
   budgets: Budget[];
+  goals: Goal[];
   today: Date;
   onAddExpense: (expense: Expense) => void;
   onCancel: () => void;
@@ -30,6 +33,9 @@ export function ExpenseForm({
   const [date, setDate] = useState(defaultDate);
   const [category, setCategory] = useState("");
   const [selectedConceptId, setSelectedConceptId] = useState("");
+  const [selectedGoalId, setSelectedGoalId] = useState("");
+  const [selectedGoalPlannedItemId, setSelectedGoalPlannedItemId] =
+    useState("");
   const [error, setError] = useState("");
   const activeBudget = useMemo(
     () => findBudgetForDate(budgets, date),
@@ -42,6 +48,13 @@ export function ExpenseForm({
   const selectedConcept =
     activeBudgetConcepts.find((concept) => concept.id === selectedConceptId) ??
     null;
+  const selectedGoal =
+    goals.find((goal) => goal.id === selectedGoalId) ?? null;
+  const selectedGoalPlannedItems = selectedGoal?.plannedItems ?? [];
+  const selectedGoalPlannedItem =
+    selectedGoalPlannedItems.find(
+      (item) => item.id === selectedGoalPlannedItemId,
+    ) ?? null;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,7 +72,7 @@ export function ExpenseForm({
     }
 
     onAddExpense({
-      id: `expense-${Date.now()}`,
+      id: createFinanceId("expense"),
       name: name.trim(),
       amount: parsedAmount,
       date,
@@ -71,6 +84,8 @@ export function ExpenseForm({
       budgetId: selectedConcept && activeBudget ? activeBudget.id : undefined,
       budgetConceptId: selectedConcept?.id,
       frequency: "One-time",
+      goalId: selectedGoal?.id,
+      goalPlannedItemId: selectedGoalPlannedItem?.id,
       tagIds: [],
     });
   }
@@ -175,6 +190,45 @@ export function ExpenseForm({
                 : `${activeBudget.name} has no concepts yet.`
               : "No active budget found for this expense date."}
           </p>
+
+          <label className="grid gap-2 text-[11px] leading-4 text-[var(--text-muted)]">
+            Goal
+            <select
+              className={fieldClass}
+              value={selectedGoal?.id ?? ""}
+              onChange={(event) => {
+                setSelectedGoalId(event.target.value);
+                setSelectedGoalPlannedItemId("");
+              }}
+            >
+              <option value="">No linked goal</option>
+              {goals.map((goal) => (
+                <option key={goal.id} value={goal.id}>
+                  {goal.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {selectedGoal ? (
+            <label className="grid gap-2 text-[11px] leading-4 text-[var(--text-muted)]">
+              Planned item
+              <select
+                className={fieldClass}
+                value={selectedGoalPlannedItem?.id ?? ""}
+                onChange={(event) =>
+                  setSelectedGoalPlannedItemId(event.target.value)
+                }
+              >
+                <option value="">No planned item</option>
+                {selectedGoalPlannedItems.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.concept}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
         </div>
 
         {error ? (

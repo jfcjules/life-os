@@ -1,4 +1,11 @@
-import type { Budget, Expense, FinanceTag, FinanceUser, Income } from "./types";
+import type {
+  Budget,
+  Expense,
+  FinanceTag,
+  FinanceUser,
+  Goal,
+  Income,
+} from "./types";
 import { formatDateInput } from "./utils";
 
 export const seedFinanceUsers: FinanceUser[] = [
@@ -63,5 +70,9 @@ export function createSeedBudgets(): Budget[] {
 }
 
 export function createSeedIncome(): Income[] {
+  return [];
+}
+
+export function createSeedGoals(): Goal[] {
   return [];
 }

@@ -6,6 +6,7 @@ import { Button } from "@/components/design-system";
 import type { Budget, FinancePeriod } from "../types";
 import {
   createBudgetWeekOptions,
+  createFinanceId,
   formatMonthInput,
 } from "../utils";
 
@@ -47,7 +48,7 @@ export function BudgetForm({
     }
 
     onAddBudget({
-      id: `budget-${Date.now()}`,
+      id: createFinanceId("budget"),
       name: name.trim(),
       period,
       month,

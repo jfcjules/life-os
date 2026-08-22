@@ -6,6 +6,7 @@ import {
   AppShell,
   Button,
   Card,
+  Panel,
 } from "@/components/design-system";
 
 import {
@@ -41,19 +42,19 @@ import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 import { ExpenseDetail } from "./expense-detail";
 import { ExpenseForm } from "./expense-form";
 import { ExpenseHistory } from "./expense-history";
-import {
-  FinanceViewToggle,
-  type FinanceView,
-} from "./finance-view-toggle";
 
-export function FinanceWorkspace() {
+export type FinanceSection = "Expenses" | "Budget" | "Goals";
+
+export function FinanceWorkspace({
+  activeSection = "Expenses",
+}: {
+  activeSection?: FinanceSection;
+}) {
   const today = useMemo(() => new Date(), []);
   const seedExpenses = useMemo(() => createSeedExpenses(today), [today]);
   const seedBudgets = useMemo(() => createSeedBudgets(), []);
   const [expenses, setExpenses] = useState(seedExpenses);
   const [budgets, setBudgets] = useState(seedBudgets);
-  const [activeFinanceView, setActiveFinanceView] =
-    useState<FinanceView>("Expenses");
   const [hasLoadedStoredExpenses, setHasLoadedStoredExpenses] = useState(false);
   const [hasLoadedStoredBudgets, setHasLoadedStoredBudgets] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
@@ -213,7 +214,7 @@ export function FinanceWorkspace() {
   }
 
   return (
-    <AppShell activeItem="Finance">
+    <AppShell activeItem="Finance" activeSubItem={activeSection}>
       <div className="flex min-h-full flex-col gap-8">
         <header className="flex items-start justify-between gap-6 max-md:flex-col">
           <div className="max-w-[700px]">
@@ -230,24 +231,20 @@ export function FinanceWorkspace() {
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-3 max-md:justify-start">
-            {activeFinanceView === "Expenses" ? (
+            {activeSection === "Expenses" ? (
               <Button onClick={() => setIsAddExpenseOpen(true)}>
                 Add expense
               </Button>
-            ) : (
+            ) : null}
+            {activeSection === "Budget" ? (
               <Button onClick={() => setIsAddBudgetOpen(true)}>
                 Add budget
               </Button>
-            )}
+            ) : null}
           </div>
         </header>
 
-        <FinanceViewToggle
-          activeView={activeFinanceView}
-          onSelectView={setActiveFinanceView}
-        />
-
-        {activeFinanceView === "Expenses" ? (
+        {activeSection === "Expenses" ? (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
             <ExpenseHistory
               expenses={periodExpenses}
@@ -296,7 +293,9 @@ export function FinanceWorkspace() {
               </Card>
             </aside>
           </div>
-        ) : (
+        ) : null}
+
+        {activeSection === "Budget" ? (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
             <BudgetList
               budgets={budgets}
@@ -344,10 +343,12 @@ export function FinanceWorkspace() {
               </Card>
             </aside>
           </div>
-        )}
+        ) : null}
+
+        {activeSection === "Goals" ? <FinanceGoalsEmptyState /> : null}
       </div>
 
-      {activeFinanceView === "Expenses" && isAddExpenseOpen ? (
+      {activeSection === "Expenses" && isAddExpenseOpen ? (
         <ExpenseForm
           budgets={budgets}
           today={today}
@@ -356,7 +357,7 @@ export function FinanceWorkspace() {
         />
       ) : null}
 
-      {activeFinanceView === "Budget" && isAddBudgetOpen ? (
+      {activeSection === "Budget" && isAddBudgetOpen ? (
         <BudgetForm
           today={today}
           onAddBudget={handleAddBudget}
@@ -364,7 +365,7 @@ export function FinanceWorkspace() {
         />
       ) : null}
 
-      {activeFinanceView === "Budget" && selectedBudget && isAddConceptOpen ? (
+      {activeSection === "Budget" && selectedBudget && isAddConceptOpen ? (
         <ConceptForm
           budgetName={selectedBudget.name}
           onAddConcept={handleAddConcept}
@@ -380,5 +381,29 @@ export function FinanceWorkspace() {
         />
       ) : null}
     </AppShell>
+  );
+}
+
+function FinanceGoalsEmptyState() {
+  return (
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
+      <Panel className="grid min-h-[420px] place-items-center">
+        <div className="max-w-[420px] text-center">
+          <p className="text-[13px] font-medium leading-5">Goals</p>
+          <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+            Financial goals will live here once the goals flow is ready.
+          </p>
+        </div>
+      </Panel>
+
+      <aside className="min-w-0 space-y-6">
+        <Card>
+          <p className="text-[12px] font-medium leading-5">Goal detail</p>
+          <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+            Select a goal to view progress, savings, and planned items.
+          </p>
+        </Card>
+      </aside>
+    </div>
   );
 }

@@ -10,6 +10,7 @@ export const primaryNavigation: NavigationItem[] = [
     href: "/finance/expenses",
     subItems: [
       { label: "Expenses", href: "/finance/expenses" },
+      { label: "Income", href: "/finance/income" },
       { label: "Budget", href: "/finance/budget" },
       { label: "Goals", href: "/finance/goals" },
     ],

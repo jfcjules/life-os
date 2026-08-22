@@ -1,5 +1,5 @@
-import { FinanceWorkspace } from "@/features/finance/components/finance-workspace";
+import { redirect } from "next/navigation";
 
 export default function FinancePage() {
-  return <FinanceWorkspace />;
+  redirect("/finance/expenses");
 }

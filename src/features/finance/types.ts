@@ -6,6 +6,18 @@ export type FinancePeriod = "Weekly" | "Bi-weekly" | "Monthly";
 
 export type FinanceFrequency = "One-time" | "Weekly" | "Monthly" | "Yearly";
 
+export type ExpenseSortOption =
+  | "amount-highest"
+  | "amount-lowest"
+  | "date-newest"
+  | "date-oldest";
+
+export type ExpenseFilters = {
+  category: string;
+  goalId: string;
+  tagId: string;
+};
+
 export type FinanceUser = {
   id: string;
   name: string;

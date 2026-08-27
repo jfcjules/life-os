@@ -2,6 +2,7 @@ import type {
   Budget,
   BudgetConcept,
   Expense,
+  ExpenseSortOption,
   FinanceFrequency,
   FinancePeriod,
   Goal,
@@ -15,6 +16,12 @@ export type PeriodRange = {
   end: Date;
 };
 
+export type FinancePeriodOption = {
+  id: string;
+  label: string;
+  anchorDate: Date;
+};
+
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
@@ -24,6 +31,11 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
   year: "numeric",
+});
+
+const shortDateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
 });
 
 const monthFormatter = new Intl.DateTimeFormat("en-US", {
@@ -37,6 +49,10 @@ export function formatCurrency(amount: number) {
 
 export function formatDate(date: string) {
   return dateFormatter.format(new Date(`${date}T00:00:00`));
+}
+
+export function formatShortDate(date: string) {
+  return shortDateFormatter.format(new Date(`${date}T00:00:00`));
 }
 
 export function formatMonth(date: Date) {
@@ -324,6 +340,32 @@ export function getPeriodRange(
   return { start, end };
 }
 
+export function getAvailableExpensePeriodOptions(
+  expenses: Expense[],
+  period: FinancePeriod,
+): FinancePeriodOption[] {
+  const periodOptions = new Map<string, FinancePeriodOption>();
+
+  for (const expense of expenses) {
+    const range = getPeriodRange(period, new Date(`${expense.date}T00:00:00`));
+    const id = `${formatDateInput(range.start)}:${formatDateInput(range.end)}`;
+
+    if (!periodOptions.has(id)) {
+      periodOptions.set(id, {
+        id,
+        label: formatDateRange(range),
+        anchorDate: range.start,
+      });
+    }
+  }
+
+  return Array.from(periodOptions.values())
+    .sort(
+      (first, second) =>
+        second.anchorDate.getTime() - first.anchorDate.getTime(),
+    );
+}
+
 export function movePeriod(
   period: FinancePeriod,
   anchorDate: Date,
@@ -365,6 +407,30 @@ export function sortByDateDesc<T extends { date: string }>(items: T[]) {
       new Date(`${second.date}T00:00:00`).getTime() -
       new Date(`${first.date}T00:00:00`).getTime(),
   );
+}
+
+export function sortExpenses(
+  expenses: Expense[],
+  sortOption: ExpenseSortOption,
+) {
+  return [...expenses].sort((first, second) => {
+    if (sortOption === "amount-highest") {
+      return second.amount - first.amount;
+    }
+
+    if (sortOption === "amount-lowest") {
+      return first.amount - second.amount;
+    }
+
+    const firstDate = new Date(`${first.date}T00:00:00`).getTime();
+    const secondDate = new Date(`${second.date}T00:00:00`).getTime();
+
+    if (sortOption === "date-oldest") {
+      return firstDate - secondDate;
+    }
+
+    return secondDate - firstDate;
+  });
 }
 
 export function sumExpenses(expenses: Expense[]) {

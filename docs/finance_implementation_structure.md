@@ -249,6 +249,32 @@ FinanceWorkspace
     Income list
 ```
 
+### 6.1 Expenses redesign direction
+
+La seccion `Expenses` debe seguir la direccion documentada en:
+
+```text
+docs/finance/expenses.md
+```
+
+Decisiones cerradas para Expenses:
+
+- Usar una composicion desktop de dos columnas:
+  - Panel principal para filtros, sorting y expense history.
+  - Rail derecho para `Period spent` y el detail del expense seleccionado.
+- El detail del expense seleccionado debe vivir debajo de `Period spent`.
+- Los filtros de expenses son `Category`, `Goal` y `Tag`.
+- El filtro `Tag` usa `tagIds` internamente, pero nunca debe llamarse `Tag ID` en el UI.
+- `Sort by` tiene dos grupos: `Amount` y `Date`.
+- `Amount` ofrece `Highest` y `Lowest`.
+- `Date` ofrece `Newest` y `Oldest`.
+- El sort default debe ser `Date -> Newest`.
+- Cada row de expense debe mostrar acciones junto al amount:
+  - Edit con icono generico de lapiz.
+  - Remove con icono generico de trash o close.
+- Reusar el comportamiento existente de remove.
+- La accion de edit requiere comportamiento de edicion de expense en el pase de implementacion o una historia explicita.
+
 MVP visual:
 
 - Evitar un dashboard demasiado denso.
@@ -320,7 +346,7 @@ Cada historia se considera lista solo si:
 - Si el period selector de overview e history debe ser compartido o independiente.
 - Si income tambien debe tener ownership desde el MVP o quedarse personal hasta una historia explicita.
 - Si tags deben existir como entidad separada desde el inicio o solo como strings en el primer pase.
-- Si editar expenses y budgets entra dentro de estas historias o se separa en historias nuevas.
+- Si editar budgets entra dentro de estas historias o se separa en historias nuevas.
 - Como se conectara una grocery shopping run completada con Finance sin crear duplicados.
 
 ## 11. Primer bloque recomendado de implementacion

@@ -259,6 +259,14 @@ docs/user_stories/finance/us-03-view-expenses-history.md
   - [x] Amount
   - [x] Date
 
+- [x] Redisenar rows como filas compactas con:
+  - [x] Date
+  - [x] Name
+  - [x] Category o metadata relacionada
+  - [x] Tags cuando existan
+  - [x] Amount
+  - [x] Acciones junto al amount
+
 - [x] Agregar selector:
   - [x] Weekly
   - [x] Biweekly
@@ -269,8 +277,25 @@ docs/user_stories/finance/us-03-view-expenses-history.md
 - [x] Agregar previous period control.
 - [x] Agregar next period control.
 - [x] Actualizar lista al cambiar periodo.
+- [x] Agregar filtros:
+  - [x] Category
+  - [x] Goal
+  - [x] Tag, respaldado por `tagIds`
+  - [x] Period
+- [x] Mover Weekly / Bi-weekly / Monthly al filtro Period.
+- [x] Agregar selector de rango dentro del filtro Period.
+- [x] Limitar opciones de period a rangos con expense data.
+- [x] Quitar flechas previous/next del card de expenses.
+- [x] Quitar selector Weekly / Bi-weekly / Monthly del card de expenses.
+- [x] Agregar sort by:
+  - [x] Amount -> Highest
+  - [x] Amount -> Lowest
+  - [x] Date -> Newest
+  - [x] Date -> Oldest
+- [x] Mantener `Date -> Newest` como sort default.
 - [x] Mostrar total spent del periodo.
 - [x] Permitir seleccionar expense para ver detalles disponibles.
+- [x] Mostrar `ExpenseDetail` debajo de `Period spent` en el rail derecho.
 - [x] Mostrar empty state si no hay expenses en el periodo.
 - [x] Confirmar que expenses eliminados no aparecen.
 - [x] Confirmar que no se implementa custom date range, imports, analytics ni receipt scanning.
@@ -641,7 +666,7 @@ Antes de cerrar:
 - [ ] Si overview e history comparten el mismo period state.
 - [ ] Si income tambien tendra ownership en MVP.
 - [ ] Si tags se guardan como entidad separada o strings simples en el primer pase.
-- [ ] Si editar expenses y budgets requiere historias nuevas separadas.
+- [ ] Si editar budgets requiere historias nuevas separadas.
 - [ ] Como conectar grocery shopping run totals con Finance sin duplicados.
 
 ## 19. Primer bloque recomendado

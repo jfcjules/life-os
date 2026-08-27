@@ -10,12 +10,14 @@ This folder documents the first user stories for the Life OS Finance concept.
 
 - [Finance implementation checklist](../../finance_implementation_checklist.md)
 - [Finance implementation structure](../../finance_implementation_structure.md)
+- [Finance expenses redesign](../../finance/expenses.md)
 
 ## Proposed Stories
 
 - Add and remove expenses: Allow the user to create expenses with the minimum required information and remove existing expenses while keeping the creation flow atomic.
 - Add new budget: Allow the user to create a budget with the minimum required financial information and make it available in the relevant Finance context.
 - View expenses history: Show previously recorded expenses chronologically and allow the user to navigate between Weekly, Biweekly, and Monthly periods, with Monthly as the default.
+- Redesign expenses history controls: Provide Category, Goal, and Tag filters, plus Amount and Date sort groups for the expenses history.
 - View expenses by ownership: Let the user classify each expense as Personal or Couple and filter the expense history by All, Personal, or Couple.
 - Assign expenses and budgets to a user: Let the user associate an expense or budget with an available user while allowing items to remain unassigned when appropriate.
 - Add due date and frequency to expenses and budgets: Allow users to define when expenses and budgets apply and whether they are one-time, weekly, monthly, or yearly.

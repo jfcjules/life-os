@@ -1,9 +1,15 @@
 import { Card } from "@/components/design-system";
 
-import type { Expense } from "../types";
+import type { Expense, FinanceTag } from "../types";
 import { formatCurrency, formatDate, getNextOccurrence } from "../utils";
 
-export function ExpenseDetail({ expense }: { expense: Expense | null }) {
+export function ExpenseDetail({
+  expense,
+  tags,
+}: {
+  expense: Expense | null;
+  tags: FinanceTag[];
+}) {
   if (!expense) {
     return (
       <Card>
@@ -19,6 +25,10 @@ export function ExpenseDetail({ expense }: { expense: Expense | null }) {
     expense.dueDate ?? expense.date,
     expense.frequency,
   );
+  const expenseTags = tags
+    .filter((tag) => expense.tagIds.includes(tag.id))
+    .map((tag) => tag.label)
+    .join(", ");
 
   return (
     <Card>
@@ -36,6 +46,7 @@ export function ExpenseDetail({ expense }: { expense: Expense | null }) {
         <DetailItem label="Date" value={formatDate(expense.date)} />
         <DetailItem label="Ownership" value={expense.ownership} />
         <DetailItem label="Category" value={expense.category ?? "None"} />
+        <DetailItem label="Tags" value={expenseTags || "None"} />
         <DetailItem label="Frequency" value={expense.frequency} />
         <DetailItem
           label="Due date"

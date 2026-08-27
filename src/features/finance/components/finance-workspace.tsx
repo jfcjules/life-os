@@ -13,18 +13,22 @@ import {
   createSeedExpenses,
   createSeedGoals,
   createSeedIncome,
+  seedFinanceTags,
 } from "../data";
 import {
   calculateBudgetPlannedAmount,
   calculateGoalSummary,
   formatCurrency,
   formatDateRange,
+  formatDateInput,
+  getAvailableExpensePeriodOptions,
   getBudgetConcepts,
   getGoalPlannedItems,
   getPeriodRange,
   isWithinPeriod,
   movePeriod,
   sortByDateDesc,
+  sortExpenses,
   calculateNetSavings,
   sumBudgetSpentAmount,
   sumBudgetsSpentAmount,
@@ -37,16 +41,21 @@ import {
   readStoredExpenses,
   readStoredGoals,
   readStoredIncome,
+  readStoredTags,
   saveStoredBudgets,
   saveStoredExpenses,
   saveStoredGoals,
   saveStoredIncome,
+  saveStoredTags,
 } from "../storage";
 import type {
   Budget,
   BudgetConcept,
   Expense,
+  ExpenseFilters,
+  ExpenseSortOption,
   FinancePeriod,
+  FinanceTag,
   Goal,
   GoalPlannedItem,
   GoalSaving,
@@ -59,7 +68,7 @@ import { ConceptForm } from "./concept-form";
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 import { ExpenseDetail } from "./expense-detail";
 import { ExpenseForm } from "./expense-form";
-import { ExpenseHistory } from "./expense-history";
+import { ExpenseControls, ExpenseHistory } from "./expense-history";
 import { FinanceOverview } from "./finance-overview";
 import { GoalDetail } from "./goal-detail";
 import { GoalForm } from "./goal-form";
@@ -116,14 +125,17 @@ export function FinanceWorkspace({
   const seedIncome = useMemo(() => createSeedIncome(), []);
   const seedBudgets = useMemo(() => createSeedBudgets(), []);
   const seedGoals = useMemo(() => createSeedGoals(), []);
+  const seedTags = useMemo(() => seedFinanceTags, []);
   const [expenses, setExpenses] = useState(seedExpenses);
   const [income, setIncome] = useState(seedIncome);
   const [budgets, setBudgets] = useState(seedBudgets);
   const [goals, setGoals] = useState(seedGoals);
+  const [tags, setTags] = useState<FinanceTag[]>(seedTags);
   const [hasLoadedStoredExpenses, setHasLoadedStoredExpenses] = useState(false);
   const [hasLoadedStoredIncome, setHasLoadedStoredIncome] = useState(false);
   const [hasLoadedStoredBudgets, setHasLoadedStoredBudgets] = useState(false);
   const [hasLoadedStoredGoals, setHasLoadedStoredGoals] = useState(false);
+  const [hasLoadedStoredTags, setHasLoadedStoredTags] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [isIncomeFormOpen, setIsIncomeFormOpen] = useState(false);
   const [isAddBudgetOpen, setIsAddBudgetOpen] = useState(false);
@@ -139,6 +151,14 @@ export function FinanceWorkspace({
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
     null,
   );
+  const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
+  const [expenseFilters, setExpenseFilters] = useState<ExpenseFilters>({
+    category: "all",
+    goalId: "all",
+    tagId: "all",
+  });
+  const [expenseSortOption, setExpenseSortOption] =
+    useState<ExpenseSortOption>("date-newest");
   const [selectedIncomeId, setSelectedIncomeId] = useState<string | null>(null);
   const [editingIncomeId, setEditingIncomeId] = useState<string | null>(null);
   const [selectedBudgetId, setSelectedBudgetId] = useState<string | null>(null);
@@ -148,9 +168,31 @@ export function FinanceWorkspace({
   const [incomePendingDelete, setIncomePendingDelete] =
     useState<Income | null>(null);
 
+  const availableExpensePeriodOptions = useMemo(
+    () => getAvailableExpensePeriodOptions(expenses, period),
+    [expenses, period],
+  );
+  const currentExpensePeriodOptionId = useMemo(() => {
+    const range = getPeriodRange(period, anchorDate);
+
+    return `${formatDateInput(range.start)}:${formatDateInput(range.end)}`;
+  }, [anchorDate, period]);
+  const selectedExpensePeriodOption = useMemo(
+    () =>
+      availableExpensePeriodOptions.find(
+        (option) => option.id === currentExpensePeriodOptionId,
+      ) ??
+      availableExpensePeriodOptions[0] ??
+      null,
+    [availableExpensePeriodOptions, currentExpensePeriodOptionId],
+  );
+  const effectiveAnchorDate =
+    activeSection === "Expenses" && selectedExpensePeriodOption
+      ? selectedExpensePeriodOption.anchorDate
+      : anchorDate;
   const periodRange = useMemo(
-    () => getPeriodRange(period, anchorDate),
-    [period, anchorDate],
+    () => getPeriodRange(period, effectiveAnchorDate),
+    [effectiveAnchorDate, period],
   );
   const periodRangeLabel = useMemo(
     () => formatDateRange(periodRange),
@@ -163,9 +205,41 @@ export function FinanceWorkspace({
     );
   }, [expenses, periodRange]);
 
+  const expenseCategoryOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        periodExpenses
+          .map((expense) => expense.category)
+          .filter((category): category is string => Boolean(category)),
+      ),
+    ).sort((first, second) => first.localeCompare(second));
+  }, [periodExpenses]);
+
+  const visibleExpenses = useMemo(() => {
+    const filteredExpenses = periodExpenses.filter((expense) => {
+      const matchesCategory =
+        expenseFilters.category === "all" ||
+        expense.category === expenseFilters.category;
+      const matchesGoal =
+        expenseFilters.goalId === "all" ||
+        expense.goalId === expenseFilters.goalId;
+      const matchesTag =
+        expenseFilters.tagId === "all" ||
+        expense.tagIds.includes(expenseFilters.tagId);
+
+      return matchesCategory && matchesGoal && matchesTag;
+    });
+
+    return sortExpenses(filteredExpenses, expenseSortOption);
+  }, [expenseFilters, expenseSortOption, periodExpenses]);
+
   const periodTotal = useMemo(
     () => sumExpenses(periodExpenses),
     [periodExpenses],
+  );
+  const visibleExpenseTotal = useMemo(
+    () => sumExpenses(visibleExpenses),
+    [visibleExpenses],
   );
   const periodIncome = useMemo(() => {
     return sortByDateDesc(
@@ -183,12 +257,18 @@ export function FinanceWorkspace({
 
   const selectedExpense = useMemo(
     () =>
-      periodExpenses.find((expense) => expense.id === selectedExpenseId) ??
-      periodExpenses[0] ??
+      visibleExpenses.find((expense) => expense.id === selectedExpenseId) ??
+      visibleExpenses[0] ??
       null,
-    [periodExpenses, selectedExpenseId],
+    [selectedExpenseId, visibleExpenses],
   );
   const activeSelectedExpenseId = selectedExpense?.id ?? null;
+  const editingExpense = useMemo(
+    () =>
+      expenses.find((expense) => expense.id === editingExpenseId) ??
+      null,
+    [editingExpenseId, expenses],
+  );
   const selectedIncome = useMemo(
     () =>
       periodIncome.find((incomeItem) => incomeItem.id === selectedIncomeId) ??
@@ -300,6 +380,15 @@ export function FinanceWorkspace({
   }, [seedGoals]);
 
   useEffect(() => {
+    const storedTags = readStoredTags(seedTags);
+
+    window.queueMicrotask(() => {
+      setTags(storedTags);
+      setHasLoadedStoredTags(true);
+    });
+  }, [seedTags]);
+
+  useEffect(() => {
     if (!hasLoadedStoredExpenses) {
       return;
     }
@@ -331,13 +420,45 @@ export function FinanceWorkspace({
     saveStoredGoals(goals);
   }, [goals, hasLoadedStoredGoals]);
 
-  function handleAddExpense(expense: Expense) {
-    setExpenses((currentExpenses) =>
-      sortByDateDesc([expense, ...currentExpenses]),
-    );
+  useEffect(() => {
+    if (!hasLoadedStoredTags) {
+      return;
+    }
+
+    saveStoredTags(tags);
+  }, [hasLoadedStoredTags, tags]);
+
+  function handleSaveExpense(expense: Expense) {
+    setExpenses((currentExpenses) => {
+      const hasExistingExpense = currentExpenses.some(
+        (currentExpense) => currentExpense.id === expense.id,
+      );
+
+      if (hasExistingExpense) {
+        return sortByDateDesc(
+          currentExpenses.map((currentExpense) =>
+            currentExpense.id === expense.id ? expense : currentExpense,
+          ),
+        );
+      }
+
+      return sortByDateDesc([expense, ...currentExpenses]);
+    });
     setSelectedExpenseId(expense.id);
     setAnchorDate(new Date(`${expense.date}T00:00:00`));
+    setEditingExpenseId(null);
     setIsAddExpenseOpen(false);
+  }
+
+  function handleOpenAddExpense() {
+    setEditingExpenseId(null);
+    setIsAddExpenseOpen(true);
+  }
+
+  function handleEditExpense(expense: Expense) {
+    setSelectedExpenseId(expense.id);
+    setEditingExpenseId(expense.id);
+    setIsAddExpenseOpen(true);
   }
 
   function handleOpenAddIncome() {
@@ -505,6 +626,29 @@ export function FinanceWorkspace({
     setPeriod(nextPeriod);
   }
 
+  function handleChangeExpensePeriod(nextPeriod: FinancePeriod) {
+    const [firstAvailablePeriodOption] = getAvailableExpensePeriodOptions(
+      expenses,
+      nextPeriod,
+    );
+
+    setPeriod(nextPeriod);
+
+    if (firstAvailablePeriodOption) {
+      setAnchorDate(firstAvailablePeriodOption.anchorDate);
+    }
+  }
+
+  function handleChangeExpensePeriodOption(periodOptionId: string) {
+    const periodOption = availableExpensePeriodOptions.find(
+      (option) => option.id === periodOptionId,
+    );
+
+    if (periodOption) {
+      setAnchorDate(periodOption.anchorDate);
+    }
+  }
+
   function handleMovePeriod(direction: -1 | 1) {
     setAnchorDate((currentAnchorDate) =>
       movePeriod(period, currentAnchorDate, direction),
@@ -528,7 +672,7 @@ export function FinanceWorkspace({
 
           <div className="flex flex-wrap items-center justify-end gap-3 max-md:justify-start">
             {activeSection === "Expenses" ? (
-              <Button onClick={() => setIsAddExpenseOpen(true)}>
+              <Button onClick={handleOpenAddExpense}>
                 Add expense
               </Button>
             ) : null}
@@ -561,53 +705,70 @@ export function FinanceWorkspace({
         ) : null}
 
         {activeSection === "Expenses" ? (
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
-            <ExpenseHistory
-              expenses={periodExpenses}
+          <div className="grid gap-6">
+            <ExpenseControls
+              categoryOptions={expenseCategoryOptions}
+              filters={expenseFilters}
+              goals={goals}
               period={period}
-              rangeLabel={periodRangeLabel}
-              total={periodTotal}
-              selectedExpenseId={activeSelectedExpenseId}
-              onAddExpense={() => setIsAddExpenseOpen(true)}
-              onChangePeriod={handleChangePeriod}
-              onMovePeriod={handleMovePeriod}
-              onRemoveExpense={setExpensePendingDelete}
-              onSelectExpense={setSelectedExpenseId}
+              periodOptions={availableExpensePeriodOptions}
+              selectedPeriodOptionId={selectedExpensePeriodOption?.id ?? null}
+              sortOption={expenseSortOption}
+              tags={tags}
+              onChangeFilters={setExpenseFilters}
+              onChangePeriod={handleChangeExpensePeriod}
+              onChangePeriodOption={handleChangeExpensePeriodOption}
+              onChangeSort={setExpenseSortOption}
             />
 
-            <aside className="min-w-0 space-y-6">
-              <Card>
-                <p className="text-[12px] leading-5 text-[var(--text-muted)]">
-                  Period spent
-                </p>
-                <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
-                  {formatCurrency(periodTotal)}
-                </p>
-                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
-                  {periodExpenses.length} expenses in the selected period
-                </p>
-              </Card>
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_424px]">
+              <ExpenseHistory
+                expenses={visibleExpenses}
+                filters={expenseFilters}
+                goals={goals}
+                tags={tags}
+                unfilteredCount={periodExpenses.length}
+                selectedExpenseId={activeSelectedExpenseId}
+                onAddExpense={handleOpenAddExpense}
+                onEditExpense={handleEditExpense}
+                onRemoveExpense={setExpensePendingDelete}
+                onSelectExpense={setSelectedExpenseId}
+              />
 
-              <ExpenseDetail expense={selectedExpense} />
+              <aside className="min-w-0 space-y-6">
+                <Card>
+                  <p className="text-[12px] leading-5 text-[var(--text-muted)]">
+                    Period spent
+                  </p>
+                  <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
+                    {formatCurrency(visibleExpenseTotal)}
+                  </p>
+                  <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+                    {visibleExpenses.length} expenses in the selected period
+                  </p>
+                </Card>
 
-              <Card>
-                <p className="text-[12px] font-medium leading-5">
-                  Quick action
-                </p>
-                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
-                  Keep the entry small and specific.
-                </p>
-                <div className="mt-5">
-                  <Button
-                    variant="secondary"
-                    className="w-full"
-                    onClick={() => setIsAddExpenseOpen(true)}
-                  >
-                    Add expense
-                  </Button>
-                </div>
-              </Card>
-            </aside>
+                <ExpenseDetail expense={selectedExpense} tags={tags} />
+
+                <Card>
+                  <p className="text-[12px] font-medium leading-5">
+                    Quick action
+                  </p>
+                  <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
+                    Keep the entry small and specific.
+                  </p>
+                  <div className="mt-5">
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      onClick={handleOpenAddExpense}
+                    >
+                      Add expense
+                    </Button>
+                  </div>
+                </Card>
+              </aside>
+            </div>
           </div>
         ) : null}
 
@@ -787,10 +948,15 @@ export function FinanceWorkspace({
       {activeSection === "Expenses" && isAddExpenseOpen ? (
         <ExpenseForm
           budgets={budgets}
+          expense={editingExpense ?? undefined}
           goals={goals}
+          mode={editingExpense ? "edit" : "add"}
           today={today}
-          onAddExpense={handleAddExpense}
-          onCancel={() => setIsAddExpenseOpen(false)}
+          onCancel={() => {
+            setIsAddExpenseOpen(false);
+            setEditingExpenseId(null);
+          }}
+          onSaveExpense={handleSaveExpense}
         />
       ) : null}
 

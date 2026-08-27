@@ -16,26 +16,33 @@ const fieldClass =
 
 export function ExpenseForm({
   budgets,
+  expense,
   goals,
+  mode = "add",
   today,
-  onAddExpense,
   onCancel,
+  onSaveExpense,
 }: {
   budgets: Budget[];
+  expense?: Expense;
   goals: Goal[];
+  mode?: "add" | "edit";
   today: Date;
-  onAddExpense: (expense: Expense) => void;
   onCancel: () => void;
+  onSaveExpense: (expense: Expense) => void;
 }) {
   const defaultDate = useMemo(() => formatDateInput(today), [today]);
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState(defaultDate);
-  const [category, setCategory] = useState("");
-  const [selectedConceptId, setSelectedConceptId] = useState("");
-  const [selectedGoalId, setSelectedGoalId] = useState("");
+  const isEditing = mode === "edit" && Boolean(expense);
+  const [name, setName] = useState(expense?.name ?? "");
+  const [amount, setAmount] = useState(expense ? String(expense.amount) : "");
+  const [date, setDate] = useState(expense?.date ?? defaultDate);
+  const [category, setCategory] = useState(expense?.category ?? "");
+  const [selectedConceptId, setSelectedConceptId] = useState(
+    expense?.budgetConceptId ?? "",
+  );
+  const [selectedGoalId, setSelectedGoalId] = useState(expense?.goalId ?? "");
   const [selectedGoalPlannedItemId, setSelectedGoalPlannedItemId] =
-    useState("");
+    useState(expense?.goalPlannedItemId ?? "");
   const [error, setError] = useState("");
   const activeBudget = useMemo(
     () => findBudgetForDate(budgets, date),
@@ -71,22 +78,24 @@ export function ExpenseForm({
       return;
     }
 
-    onAddExpense({
-      id: createFinanceId("expense"),
+    onSaveExpense({
+      id: expense?.id ?? createFinanceId("expense"),
       name: name.trim(),
       amount: parsedAmount,
       date,
-      ownership: "Personal",
+      ownership: expense?.ownership ?? "Personal",
       category:
         activeBudgetConcepts.length > 0
-          ? selectedConcept?.name
+          ? selectedConcept?.name ?? (category.trim() || undefined)
           : category.trim() || undefined,
       budgetId: selectedConcept && activeBudget ? activeBudget.id : undefined,
       budgetConceptId: selectedConcept?.id,
-      frequency: "One-time",
+      assignedUserId: expense?.assignedUserId,
+      dueDate: expense?.dueDate,
+      frequency: expense?.frequency ?? "One-time",
       goalId: selectedGoal?.id,
       goalPlannedItemId: selectedGoalPlannedItem?.id,
-      tagIds: [],
+      tagIds: expense?.tagIds ?? [],
     });
   }
 
@@ -100,7 +109,7 @@ export function ExpenseForm({
         className="max-h-[calc(100vh-48px)] w-full max-w-[560px] overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-content)] p-6 shadow-[var(--shadow-dialog)]"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="add-expense-title"
+        aria-labelledby="expense-form-title"
       >
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
@@ -108,10 +117,10 @@ export function ExpenseForm({
               Finance
             </p>
             <h2
-              id="add-expense-title"
+              id="expense-form-title"
               className="mt-2 text-[20px] font-medium leading-7 text-[var(--text-primary)]"
             >
-              Add expense
+              {isEditing ? "Edit expense" : "Add expense"}
             </h2>
           </div>
           <Button variant="ghost" onClick={onCancel}>
@@ -241,7 +250,9 @@ export function ExpenseForm({
           <Button variant="ghost" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">Add expense</Button>
+          <Button type="submit">
+            {isEditing ? "Save expense" : "Add expense"}
+          </Button>
         </div>
       </form>
     </div>

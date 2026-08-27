@@ -101,9 +101,9 @@ export function QuickActionTile({
     <button
       type="button"
       onClick={onClick}
-      className="flex min-h-[92px] flex-col justify-between rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4 text-left transition hover:-translate-y-0.5 hover:border-[rgba(95,128,212,0.28)]"
+      className="flex min-h-[92px] flex-col justify-between rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4 text-left transition hover:-translate-y-0.5 hover:border-[var(--action-hover-border)]"
     >
-      <span className="grid size-8 place-items-center rounded-[12px] bg-[var(--color-action-secondary)] text-[11px] font-medium text-[var(--text-muted)]">
+      <span className="grid size-8 place-items-center rounded-[var(--radius-sm)] bg-[var(--color-action-secondary)] text-[11px] font-medium text-[var(--text-muted)]">
         {action.key}
       </span>
       <span className="text-[13px] font-medium leading-5 text-[var(--text-primary)]">
@@ -155,12 +155,12 @@ export function QuickAddModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-[rgba(8,17,32,0.24)] px-4 py-8 backdrop-blur-[10px]">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-[var(--overlay-scrim)] px-4 py-8 backdrop-blur-[10px]">
       <section
         role="dialog"
         aria-modal="true"
         aria-labelledby="quick-add-title"
-        className="flex max-h-[min(760px,calc(100vh-48px))] w-full max-w-[520px] flex-col overflow-hidden rounded-[30px] border border-[var(--border-subtle)] bg-[var(--surface-content)] shadow-[0_24px_70px_rgba(8,17,32,0.16)]"
+        className="flex max-h-[min(760px,calc(100vh-48px))] w-full max-w-[520px] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-content)] shadow-[var(--shadow-dialog)]"
       >
         <div className="flex items-start justify-between gap-5 border-b border-[var(--border-subtle)] px-6 py-5">
           <div>
@@ -182,7 +182,7 @@ export function QuickAddModal({
             type="button"
             aria-label="Close quick add"
             onClick={handleClose}
-            className="grid size-10 shrink-0 place-items-center rounded-[14px] bg-[var(--surface-raised)] text-[14px]"
+            className="grid size-10 shrink-0 place-items-center rounded-[var(--radius-action)] bg-[var(--surface-raised)] text-[14px]"
           >
             x
           </button>
@@ -205,8 +205,8 @@ export function QuickAddModal({
 
         <div className="overflow-y-auto px-6 py-5">
           {isSaved ? (
-            <div className="rounded-[24px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-6">
-              <div className="grid size-14 place-items-center rounded-[18px] bg-[var(--color-action-secondary)] text-[18px] font-medium">
+            <div className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-6">
+              <div className="grid size-14 place-items-center rounded-[var(--radius-md)] bg-[var(--color-action-secondary)] text-[18px] font-medium">
                 {activeAction?.key ?? "+"}
               </div>
               <h3 className="mt-6 text-[18px] font-medium leading-6">
@@ -234,9 +234,9 @@ export function QuickAddModal({
                 setIsSaved(true);
               }}
             >
-              <div className="rounded-[24px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5">
+              <div className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5">
                 <div className="flex items-center gap-4">
-                  <span className="grid size-12 place-items-center rounded-[16px] bg-[var(--color-action-secondary)] text-[13px] font-medium">
+                  <span className="grid size-12 place-items-center rounded-[var(--radius-action)] bg-[var(--color-action-secondary)] text-[13px] font-medium">
                     {activeAction.key}
                   </span>
                   <div>
@@ -256,7 +256,7 @@ export function QuickAddModal({
                     {field.label}
                   </span>
                   <input
-                    className="min-h-12 rounded-[16px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 text-[12px] text-[var(--text-primary)] outline-none placeholder:text-[rgba(45,53,66,0.62)] focus:border-[rgba(95,128,212,0.54)]"
+                    className="min-h-12 rounded-[var(--radius-action)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 text-[12px] text-[var(--text-primary)] outline-none placeholder:text-[var(--placeholder-muted)] focus:border-[var(--color-action-primary)]"
                     placeholder={field.placeholder}
                   />
                 </label>
@@ -278,9 +278,9 @@ export function QuickAddModal({
                   key={action.id}
                   type="button"
                   onClick={() => handleChooseType(action.id)}
-                  className="flex min-h-[96px] items-center gap-5 rounded-[22px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5 text-left transition hover:-translate-y-0.5 hover:border-[rgba(95,128,212,0.34)]"
+                  className="flex min-h-[96px] items-center gap-5 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5 text-left transition hover:-translate-y-0.5 hover:border-[var(--action-hover-border)]"
                 >
-                  <span className="grid size-12 shrink-0 place-items-center rounded-[16px] bg-[var(--color-action-secondary)] text-[13px] font-medium">
+                  <span className="grid size-12 shrink-0 place-items-center rounded-[var(--radius-action)] bg-[var(--color-action-secondary)] text-[13px] font-medium">
                     {action.key}
                   </span>
                   <span className="min-w-0">

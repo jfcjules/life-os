@@ -41,9 +41,9 @@ export function GoalRow({
 
   return (
     <article
-      className={`grid w-full gap-4 rounded-[18px] border p-5 transition ${
+      className={`grid w-full gap-4 rounded-[var(--radius-md)] border p-5 transition ${
         isSelected
-          ? "border-[rgba(95,128,212,0.42)] bg-[rgba(207,217,242,0.58)]"
+          ? "border-[var(--color-action-primary)] bg-[var(--action-selected)]"
           : "border-[var(--border-subtle)] bg-[var(--surface-raised)]"
       }`}
     >
@@ -67,7 +67,7 @@ export function GoalRow({
             <span
               className={`rounded-full px-3 py-1 text-[10px] leading-4 text-[var(--text-primary)] ${
                 goal.status === "Completed"
-                  ? "bg-[rgba(126,168,139,0.22)]"
+                  ? "bg-[var(--accent-green-muted)]"
                   : "bg-[var(--color-action-secondary)]"
               }`}
             >
@@ -178,7 +178,7 @@ function CollapsibleSection({
   title: string;
 }) {
   return (
-    <section className="rounded-[16px] bg-[rgba(227,233,247,0.46)]">
+    <section className="rounded-[var(--radius-action)] bg-[var(--surface-content-muted)]">
       <button
         type="button"
         className="flex min-h-11 w-full items-center justify-between gap-3 px-4 py-2 text-left"
@@ -221,7 +221,7 @@ function PlannedItemCard({
       : calculateProgressPercent(savedAmount, item.estimatedAmount);
 
   return (
-    <article className="rounded-[16px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 py-3">
+    <article className="rounded-[var(--radius-action)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 py-3">
       <div className="flex min-w-0 items-start justify-between gap-4 max-sm:flex-col">
         <div className="min-w-0">
           <p className="text-[13px] font-medium leading-5 text-[var(--text-primary)]">
@@ -304,7 +304,7 @@ function ExpenseRow({
 
 function MiniRow({ detail, title }: { detail: string; title: string }) {
   return (
-    <div className="rounded-[16px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 py-3">
+    <div className="rounded-[var(--radius-action)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 py-3">
       <p className="text-[13px] font-medium leading-5 text-[var(--text-primary)]">
         {title}
       </p>
@@ -317,7 +317,7 @@ function MiniRow({ detail, title }: { detail: string; title: string }) {
 
 function EmptyLine({ text }: { text: string }) {
   return (
-    <div className="rounded-[16px] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4">
+    <div className="rounded-[var(--radius-action)] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4">
       <p className="text-[11px] leading-5 text-[var(--text-muted)]">{text}</p>
     </div>
   );
@@ -326,7 +326,7 @@ function EmptyLine({ text }: { text: string }) {
 function ProgressBar({ label, value }: { label: string; value: number }) {
   return (
     <span
-      className="block h-2 overflow-hidden rounded-full bg-[rgba(227,233,247,0.9)]"
+      className="block h-2 overflow-hidden rounded-full bg-[var(--surface-content)]"
       role="progressbar"
       aria-label={label}
       aria-valuemin={0}

@@ -66,7 +66,6 @@ export function FinanceOverview({
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
       <Panel>
         <SectionHeader
-          title="Overview"
           action={`${income.length + expenses.length} records`}
         />
 
@@ -100,15 +99,15 @@ export function FinanceOverview({
           />
         </div>
 
-        <div className="mt-5 grid gap-5 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5 md:grid-cols-[240px_minmax(0,1fr)]">
+        <div className="mt-5 grid gap-5 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5 md:grid-cols-[240px_minmax(0,1fr)]">
           <div className="flex items-center justify-center">
             <div
               aria-label="Income, expenses, and net savings distribution"
               role="img"
-              className="grid aspect-square w-full max-w-[220px] place-items-center rounded-full shadow-[inset_0_0_0_1px_rgba(8,17,32,0.08)]"
+              className="grid aspect-square w-full max-w-[220px] place-items-center rounded-full shadow-[inset_0_0_0_1px_var(--border-subtle)]"
               style={{ background: pieBackground }}
             >
-              <div className="grid size-[47%] place-items-center rounded-full bg-[var(--surface-raised)] text-center shadow-[0_12px_28px_rgba(8,17,32,0.08)]">
+              <div className="grid size-[47%] place-items-center rounded-full bg-[var(--surface-raised)] text-center shadow-[var(--shadow-surface)]">
                 <span className="text-[10px] leading-4 text-[var(--text-muted)]">
                   Net
                 </span>
@@ -123,7 +122,7 @@ export function FinanceOverview({
             {pieMetrics.map((metric) => (
               <div
                 key={metric.label}
-                className="flex min-h-14 items-center justify-between gap-4 rounded-[14px] bg-[var(--background-page)] px-4 py-3"
+                className="flex min-h-14 items-center justify-between gap-4 rounded-[var(--radius-action)] bg-[var(--background-page)] px-4 py-3"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <span
@@ -168,7 +167,7 @@ export function FinanceOverview({
           <p className="text-[12px] leading-5 text-[var(--text-muted)]">
             Largest expense group
           </p>
-          <p className="mt-3 text-[24px] font-medium leading-8 text-[var(--text-primary)]">
+          <p className="mt-3 break-words text-[20px] font-medium leading-7 text-[var(--text-primary)]">
             {topExpenseCategory?.category ?? "No expenses"}
           </p>
           <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
@@ -213,7 +212,7 @@ function MetricCard({
         style={{ backgroundColor: accent }}
       />
       <p className="text-[11px] leading-5 text-[var(--text-muted)]">{label}</p>
-      <p className="mt-3 break-words text-[24px] font-medium leading-8 text-[var(--text-primary)]">
+      <p className="mt-3 break-words text-[20px] font-medium leading-7 text-[var(--text-primary)]">
         {value}
       </p>
       <p className="mt-3 text-[10px] leading-4 text-[var(--text-muted)]">

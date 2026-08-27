@@ -132,7 +132,7 @@ These tokens come from the current UX decisions and should remain semantic.
 | `surface-raised` | `#F1F4FA` | Slightly raised nested surfaces and controls. |
 | `text-primary` | `#081120` | Main text. |
 | `text-muted` | `#2D3542` | Metadata, labels, quiet helper text. |
-| `border-subtle` | `rgba(8, 17, 32, 0.07)` | Soft structure for cards and rows. |
+| `border-subtle` | `#C8D0DF` | Soft structure for cards and rows. |
 
 Supporting accent colors used lightly in Concept A:
 
@@ -210,7 +210,7 @@ Use shadows sparingly.
 Initial shadow direction:
 
 ```css
-0 24px 70px rgba(8, 17, 32, 0.10)
+0 24px 35px rgba(8, 17, 32, 0.10)
 0 16px 34px rgba(95, 128, 212, 0.24)
 ```
 

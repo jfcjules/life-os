@@ -77,6 +77,35 @@ export type FinanceSection =
   | "Budget"
   | "Goals";
 
+const financeSectionMeta: Record<
+  FinanceSection,
+  {
+    title: string;
+    description: string;
+  }
+> = {
+  Overview: {
+    title: "Overview",
+    description: "Money in, money out, and what stays.",
+  },
+  Expenses: {
+    title: "Expenses",
+    description: "Track spending for the selected period.",
+  },
+  Income: {
+    title: "Income",
+    description: "Log money as it comes in.",
+  },
+  Budget: {
+    title: "Budget",
+    description: "Plan spending before it happens.",
+  },
+  Goals: {
+    title: "Goals",
+    description: "Follow savings and planned purchases.",
+  },
+};
+
 export function FinanceWorkspace({
   activeSection = "Overview",
 }: {
@@ -482,20 +511,18 @@ export function FinanceWorkspace({
     );
   }
 
+  const sectionMeta = financeSectionMeta[activeSection];
+
   return (
     <AppShell activeItem="Finance" activeSubItem={activeSection}>
-      <div className="flex min-h-full flex-col gap-8">
+      <div className="flex min-h-full flex-col gap-6">
         <header className="flex items-start justify-between gap-6 max-md:flex-col">
           <div className="max-w-[700px]">
-            <p className="text-[12px] leading-5 text-[var(--text-muted)]">
-              Life OS
-            </p>
-            <h1 className="mt-3 text-[clamp(2.75rem,7vw,5.5rem)] font-medium leading-[0.96] text-[var(--text-primary)]">
-              Finance
+            <h1 className="text-[42px] font-medium leading-[1.05] text-[var(--text-primary)] sm:text-[52px]">
+              {sectionMeta.title}
             </h1>
-            <p className="mt-5 max-w-[560px] text-[13px] leading-6 text-[var(--text-muted)]">
-              Record money in and out, then keep budget planning in the same
-              quiet Finance space.
+            <p className="mt-3 max-w-[420px] text-[13px] leading-6 text-[var(--text-muted)]">
+              {sectionMeta.description}
             </p>
           </div>
 

@@ -21,9 +21,9 @@ export function BudgetRow({
   return (
     <button
       type="button"
-      className={`grid min-h-[92px] w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-4 rounded-[18px] border p-5 text-left transition max-sm:grid-cols-1 ${
+      className={`grid min-h-[92px] w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-4 rounded-[var(--radius-md)] border p-5 text-left transition max-sm:grid-cols-1 ${
         isSelected
-          ? "border-[rgba(95,128,212,0.42)] bg-[rgba(207,217,242,0.58)]"
+          ? "border-[var(--color-action-primary)] bg-[var(--action-selected)]"
           : "border-[var(--border-subtle)] bg-[var(--surface-raised)]"
       }`}
       aria-pressed={isSelected}
@@ -39,7 +39,7 @@ export function BudgetRow({
       </span>
 
       <span className="grid justify-items-end gap-2 max-sm:justify-items-start">
-        <span className="rounded-full bg-[rgba(126,168,139,0.22)] px-3 py-1 text-[10px] leading-4 text-[var(--text-primary)]">
+        <span className="rounded-full bg-[var(--accent-green-muted)] px-3 py-1 text-[10px] leading-4 text-[var(--text-primary)]">
           {budget.period}
         </span>
         <span className="text-[12px] font-medium leading-5 text-[var(--text-primary)]">

@@ -52,7 +52,7 @@ export function ExpenseDetail({ expense }: { expense: Expense | null }) {
 
 function DetailItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[120px_minmax(0,1fr)] gap-3 rounded-[14px] bg-[rgba(227,233,247,0.68)] px-4 py-3 max-sm:grid-cols-1">
+    <div className="grid grid-cols-[120px_minmax(0,1fr)] gap-3 rounded-[var(--radius-action)] bg-[var(--surface-content-muted)] px-4 py-3 max-sm:grid-cols-1">
       <dt className="text-[var(--text-muted)]">{label}</dt>
       <dd className="min-w-0 text-[var(--text-primary)]">{value}</dd>
     </div>

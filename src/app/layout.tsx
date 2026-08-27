@@ -4,7 +4,7 @@ import "./globals.css";
 
 const azeretMono = Azeret_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
   display: "swap",
   variable: "--font-azeret-mono",
 });

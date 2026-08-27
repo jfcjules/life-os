@@ -7,7 +7,7 @@ import type { BudgetConcept } from "../types";
 import { createFinanceId } from "../utils";
 
 const fieldClass =
-  "min-h-11 w-full rounded-[14px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 text-[12px] text-[var(--text-primary)] outline-none transition focus:border-[var(--color-action-primary)]";
+  "min-h-11 w-full rounded-[var(--radius-action)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 text-[12px] text-[var(--text-primary)] outline-none transition focus:border-[var(--color-action-primary)]";
 
 export function ConceptForm({
   budgetName,
@@ -46,12 +46,12 @@ export function ConceptForm({
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-[rgba(8,17,32,0.32)] px-4 py-6"
+      className="fixed inset-0 z-50 grid place-items-center bg-[var(--overlay-scrim)] px-4 py-6"
       role="presentation"
     >
       <form
         onSubmit={handleSubmit}
-        className="max-h-[calc(100vh-48px)] w-full max-w-[520px] overflow-y-auto rounded-[28px] border border-[var(--border-subtle)] bg-[var(--surface-content)] p-6 shadow-[0_28px_90px_rgba(8,17,32,0.24)]"
+        className="max-h-[calc(100vh-48px)] w-full max-w-[520px] overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-content)] p-6 shadow-[var(--shadow-dialog)]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-concept-title"
@@ -99,7 +99,7 @@ export function ConceptForm({
         </div>
 
         {error ? (
-          <p className="mt-4 rounded-[14px] bg-[rgba(214,155,168,0.22)] px-4 py-3 text-[12px] leading-5 text-[var(--text-primary)]">
+          <p className="mt-4 rounded-[var(--radius-action)] bg-[var(--accent-rose-muted)] px-4 py-3 text-[12px] leading-5 text-[var(--text-primary)]">
             {error}
           </p>
         ) : null}

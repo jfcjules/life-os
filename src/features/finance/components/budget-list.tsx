@@ -16,7 +16,7 @@ export function BudgetList({
 }) {
   return (
     <Panel>
-      <SectionHeader title="Budgets" action={`${budgets.length} budgets`} />
+      <SectionHeader action={`${budgets.length} budgets`} />
 
       {budgets.length > 0 ? (
         <div className="mt-5 space-y-3">
@@ -30,7 +30,7 @@ export function BudgetList({
           ))}
         </div>
       ) : (
-        <div className="mt-5 rounded-[18px] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5">
+        <div className="mt-5 rounded-[var(--radius-md)] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5">
           <p className="text-[13px] font-medium leading-5">No budgets yet.</p>
           <div className="mt-5">
             <Button variant="secondary" onClick={onAddBudget}>

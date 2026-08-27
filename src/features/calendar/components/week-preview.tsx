@@ -14,7 +14,7 @@ export function WeekPreview({ days }: { days: WeekPreviewDay[] }) {
         {days.map((day) => (
           <article
             key={day.id}
-            className="min-h-[138px] rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4"
+            className="min-h-[138px] rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4"
           >
             <div className="flex items-start justify-between gap-3">
               <div>

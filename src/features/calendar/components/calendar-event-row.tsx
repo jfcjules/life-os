@@ -8,7 +8,7 @@ import { CalendarChip } from "./chip";
 
 export function CalendarEventRow({ event }: { event: CalendarEvent }) {
   return (
-    <article className="grid min-h-[104px] grid-cols-[72px_minmax(0,1fr)] gap-5 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5 max-sm:grid-cols-1 max-sm:gap-3">
+    <article className="grid min-h-[104px] grid-cols-[72px_minmax(0,1fr)] gap-5 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5 max-sm:grid-cols-1 max-sm:gap-3">
       <span className="text-[12px] font-medium leading-5 text-[var(--text-muted)]">
         {formatEventTime(event)}
       </span>

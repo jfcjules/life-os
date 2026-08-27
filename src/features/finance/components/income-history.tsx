@@ -32,7 +32,7 @@ export function IncomeHistory({
 }) {
   return (
     <Panel>
-      <SectionHeader title="Income history" action={`${income.length} entries`} />
+      <SectionHeader action={`${income.length} entries`} />
 
       <div className="mt-5">
         <FinancePeriodSelector
@@ -43,7 +43,7 @@ export function IncomeHistory({
         />
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-5 py-4">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-5 py-4">
         <p className="text-[11px] leading-5 text-[var(--text-muted)]">
           Total income in selected period
         </p>
@@ -66,7 +66,7 @@ export function IncomeHistory({
           ))}
         </div>
       ) : (
-        <div className="mt-5 rounded-[18px] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5">
+        <div className="mt-5 rounded-[var(--radius-md)] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5">
           <p className="text-[13px] font-medium leading-5">
             No income recorded in this period.
           </p>

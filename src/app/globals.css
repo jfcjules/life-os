@@ -3,18 +3,43 @@
 :root {
   --background: #e9ecf2;
   --foreground: #081120;
+
   --color-action-primary: #5f80d4;
   --color-action-secondary: #cfd9f2;
+
   --background-page: #e9ecf2;
   --surface-content: #e3e9f7;
   --surface-raised: #f1f4fa;
+
   --text-primary: #081120;
   --text-muted: #2d3542;
-  --border-subtle: rgba(8, 17, 32, 0.08);
+  --border-subtle: #c8d0df;
+
   --accent-green: #7ea88b;
   --accent-lilac: #a594c7;
   --accent-rose: #d69ba8;
   --accent-amber: #d5b276;
+
+  --radius-sm: 12px;
+  --radius-action: 14px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --radius-shell: 34px;
+
+  --shadow-shell: 0 24px 35px rgba(8, 17, 32, 0.1);
+  --shadow-action: 0 16px 34px rgba(95, 128, 212, 0.24);
+  --shadow-surface: 0 10px 24px rgba(8, 17, 32, 0.05);
+  --shadow-dialog: 0 24px 70px rgba(8, 17, 32, 0.16);
+
+  --overlay-scrim: rgba(8, 17, 32, 0.32);
+  --action-selected: rgba(207, 217, 242, 0.72);
+  --action-hover-border: rgba(95, 128, 212, 0.34);
+  --placeholder-muted: rgba(45, 53, 66, 0.62);
+  --surface-content-muted: rgba(227, 233, 247, 0.68);
+  --accent-green-muted: rgba(126, 168, 139, 0.28);
+  --accent-lilac-muted: rgba(165, 148, 199, 0.28);
+  --accent-rose-muted: rgba(214, 155, 168, 0.28);
+  --accent-amber-muted: rgba(213, 178, 118, 0.3);
 }
 
 @theme inline {
@@ -27,6 +52,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  letter-spacing: 0;
   font-family: var(
     --font-azeret-mono,
     "Azeret Mono",

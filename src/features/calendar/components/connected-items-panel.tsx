@@ -14,7 +14,7 @@ export function ConnectedItemsPanel({ items }: { items: ConnectedItem[] }) {
           {items.map((item) => (
             <article
               key={item.id}
-              className="rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4"
+              className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
@@ -36,7 +36,7 @@ export function ConnectedItemsPanel({ items }: { items: ConnectedItem[] }) {
           ))}
         </div>
       ) : (
-        <div className="mt-5 rounded-[18px] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4">
+        <div className="mt-5 rounded-[var(--radius-md)] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4">
           <p className="text-[12px] font-medium leading-5">
             No preparation items.
           </p>

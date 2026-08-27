@@ -40,7 +40,7 @@ export function GoalDetail({
         action={goal.targetDate ? formatDate(goal.targetDate) : "No target date"}
       />
 
-      <div className="mt-5 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--background-page)] px-5 py-4">
+      <div className="mt-5 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--background-page)] px-5 py-4">
         <p className="text-[11px] leading-5 text-[var(--text-muted)]">
           Saved so far
         </p>
@@ -61,7 +61,7 @@ export function GoalDetail({
 
         {summary.progressPercent !== undefined ? (
           <div
-            className="mt-4 h-2 overflow-hidden rounded-full bg-[rgba(227,233,247,0.9)]"
+            className="mt-4 h-2 overflow-hidden rounded-full bg-[var(--surface-content)]"
             role="progressbar"
             aria-label={`${goal.name} savings progress`}
             aria-valuemin={0}
@@ -117,7 +117,7 @@ export function GoalDetail({
 
 function DetailItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[120px_minmax(0,1fr)] gap-3 rounded-[14px] bg-[rgba(227,233,247,0.68)] px-4 py-3 max-sm:grid-cols-1">
+    <div className="grid grid-cols-[120px_minmax(0,1fr)] gap-3 rounded-[var(--radius-action)] bg-[var(--surface-content-muted)] px-4 py-3 max-sm:grid-cols-1">
       <dt className="text-[var(--text-muted)]">{label}</dt>
       <dd className="min-w-0 text-[var(--text-primary)]">{value}</dd>
     </div>

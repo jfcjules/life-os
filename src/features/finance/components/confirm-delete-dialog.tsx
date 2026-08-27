@@ -15,11 +15,11 @@ export function ConfirmDeleteDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-[rgba(8,17,32,0.32)] px-4 py-6"
+      className="fixed inset-0 z-50 grid place-items-center bg-[var(--overlay-scrim)] px-4 py-6"
       role="presentation"
     >
       <div
-        className="w-full max-w-[420px] rounded-[28px] border border-[var(--border-subtle)] bg-[var(--surface-content)] p-6 shadow-[0_28px_90px_rgba(8,17,32,0.24)]"
+        className="w-full max-w-[420px] rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--surface-content)] p-6 shadow-[var(--shadow-dialog)]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-finance-item-title"

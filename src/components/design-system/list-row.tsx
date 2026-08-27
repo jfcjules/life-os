@@ -10,7 +10,7 @@ export function ListRow({
   tag?: string;
 }) {
   return (
-    <article className="grid min-h-16 grid-cols-[72px_1fr_auto] items-center gap-5 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-5 py-3 max-sm:grid-cols-[68px_minmax(0,1fr)] max-sm:gap-3">
+    <article className="grid min-h-16 grid-cols-[72px_1fr_auto] items-center gap-5 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-5 py-3 max-sm:grid-cols-[68px_minmax(0,1fr)] max-sm:gap-3">
       <span className="text-[11px] leading-4 text-[var(--text-muted)]">
         {leading}
       </span>
@@ -45,7 +45,7 @@ export function PreviewCard({
   detail?: string;
 }) {
   return (
-    <article className="flex min-h-[126px] flex-col justify-between rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5">
+    <article className="flex min-h-[126px] flex-col justify-between rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h3 className="truncate text-[13px] font-medium leading-5 text-[var(--text-primary)]">
@@ -57,7 +57,7 @@ export function PreviewCard({
             </p>
           ) : null}
         </div>
-        <span className="grid size-8 shrink-0 place-items-center rounded-[12px] bg-[var(--color-action-secondary)] text-[11px] font-medium text-[var(--text-muted)]">
+        <span className="grid size-8 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-[var(--color-action-secondary)] text-[11px] font-medium text-[var(--text-muted)]">
           {marker}
         </span>
       </div>

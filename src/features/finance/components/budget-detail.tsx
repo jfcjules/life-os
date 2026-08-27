@@ -40,7 +40,7 @@ export function BudgetDetail({
     <Card>
       <SectionHeader title={budget.name} action={formatBudgetPeriod(budget)} />
 
-      <div className="mt-5 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--background-page)] px-5 py-4">
+      <div className="mt-5 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--background-page)] px-5 py-4">
         <p className="text-[11px] leading-5 text-[var(--text-muted)]">
           Planned amount
         </p>
@@ -79,7 +79,7 @@ export function BudgetDetail({
           ))}
         </div>
       ) : (
-        <div className="mt-4 rounded-[16px] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4">
+        <div className="mt-4 rounded-[var(--radius-action)] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4">
           <p className="text-[11px] leading-5 text-[var(--text-muted)]">
             This budget does not have concepts yet.
           </p>
@@ -107,13 +107,13 @@ function ConceptProgress({
   const isOverBudget = progressStatus === "Over budget";
   const isComplete = progressStatus === "Complete";
   const progressColor = isOverBudget
-    ? "bg-[rgba(214,155,168,0.88)]"
+    ? "bg-[var(--accent-rose)]"
     : isComplete
-      ? "bg-[rgba(126,168,139,0.88)]"
+      ? "bg-[var(--accent-green)]"
       : "bg-[var(--color-action-primary)]";
 
   return (
-    <div className="rounded-[16px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 py-3">
+    <div className="rounded-[var(--radius-action)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 py-3">
       <div className="flex min-w-0 items-start justify-between gap-4 max-sm:flex-col">
         <div className="min-w-0">
           <p className="min-w-0 text-[13px] font-medium leading-5">
@@ -129,7 +129,7 @@ function ConceptProgress({
       </div>
 
       <div
-        className="mt-3 h-2 overflow-hidden rounded-full bg-[rgba(227,233,247,0.9)]"
+        className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--surface-content)]"
         role="progressbar"
         aria-label={`${concept.name} spending progress`}
         aria-valuemin={0}

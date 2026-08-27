@@ -16,7 +16,7 @@ export function EmptyWorkspace({
             <p className="text-[12px] leading-5 text-[var(--text-muted)]">
               {eyebrow}
             </p>
-            <h1 className="mt-3 text-[clamp(2.75rem,7vw,5.75rem)] font-medium leading-[0.96] text-[var(--text-primary)]">
+            <h1 className="mt-3 text-[42px] font-medium leading-[1.05] text-[var(--text-primary)] sm:text-[52px]">
               {title}
             </h1>
           </div>

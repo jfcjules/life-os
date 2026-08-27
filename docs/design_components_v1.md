@@ -200,6 +200,8 @@ Current token groups:
 - Background and surface colors
 - Text colors
 - Subtle border
+- Radius scale from Foundations
+- Foundation shadows and overlays
 - Exploratory accents
 - Azeret Mono font mapping
 

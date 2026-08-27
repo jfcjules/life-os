@@ -16,7 +16,7 @@ export function ConceptScopePanel() {
 
 function ScopeRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[76px_minmax(0,1fr)] gap-4 rounded-[16px] bg-[var(--surface-raised)] px-4 py-3 text-[11px] leading-5">
+    <div className="grid grid-cols-[76px_minmax(0,1fr)] gap-4 rounded-[var(--radius-action)] bg-[var(--surface-raised)] px-4 py-3 text-[11px] leading-5">
       <span className="text-[var(--text-muted)]">{label}</span>
       <span className="font-medium">{value}</span>
     </div>

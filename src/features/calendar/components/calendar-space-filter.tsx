@@ -24,7 +24,7 @@ export function CalendarSpaceFilter({
             onClick={() => onSelectSpace?.(space)}
             className={`min-h-9 rounded-full px-4 text-[11px] ${
               isSelected
-                ? "bg-[var(--color-action-secondary)] font-medium text-[var(--text-primary)]"
+                ? "bg-[var(--action-selected)] font-medium text-[var(--text-primary)]"
                 : "border border-[var(--border-subtle)] bg-[var(--surface-raised)] text-[var(--text-muted)]"
             }`}
           >

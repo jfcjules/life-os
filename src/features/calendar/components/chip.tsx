@@ -2,10 +2,10 @@ import type { CalendarTone } from "../types";
 
 const toneClass: Record<CalendarTone, string> = {
   blue: "bg-[var(--color-action-secondary)]",
-  green: "bg-[rgba(126,168,139,0.28)]",
-  lilac: "bg-[rgba(165,148,199,0.28)]",
-  rose: "bg-[rgba(214,155,168,0.28)]",
-  amber: "bg-[rgba(213,178,118,0.30)]",
+  green: "bg-[var(--accent-green-muted)]",
+  lilac: "bg-[var(--accent-lilac-muted)]",
+  rose: "bg-[var(--accent-rose-muted)]",
+  amber: "bg-[var(--accent-amber-muted)]",
 };
 
 export function CalendarChip({

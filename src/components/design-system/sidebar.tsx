@@ -31,10 +31,10 @@ export function Sidebar({
   navigationItems?: NavigationItem[];
 }) {
   return (
-    <aside className="flex min-h-full flex-col justify-between border-r border-[var(--border-subtle)] bg-[rgba(241,244,250,0.52)] px-5 py-6 max-lg:hidden">
+    <aside className="flex min-h-full flex-col justify-between border-r border-[var(--border-subtle)] bg-[var(--surface-content)] px-[18px] py-[26px] max-lg:hidden">
       <div>
         <div className="flex items-center gap-3 px-1">
-          <div className="grid size-11 place-items-center rounded-[16px] bg-[var(--color-action-primary)] text-sm font-medium shadow-[0_16px_34px_rgba(95,128,212,0.24)]">
+          <div className="grid size-11 place-items-center rounded-[var(--radius-action)] bg-[var(--color-action-primary)] text-sm font-medium shadow-[var(--shadow-action)]">
             L
           </div>
           <div>
@@ -45,16 +45,16 @@ export function Sidebar({
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-2 rounded-[18px] bg-[var(--background-page)] p-1">
+        <div className="mt-8 grid grid-cols-2 gap-2 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-1">
           <button
             type="button"
-            className="rounded-[14px] bg-[var(--surface-raised)] px-3 py-2 text-[11px] font-medium"
+            className="rounded-[13px] bg-[var(--color-action-secondary)] px-3 py-2 text-[11px] font-medium"
           >
             Personal
           </button>
           <button
             type="button"
-            className="rounded-[14px] px-3 py-2 text-[11px] text-[var(--text-muted)]"
+            className="rounded-[var(--radius-action)] px-3 py-2 text-[11px] text-[var(--text-muted)]"
           >
             Couple
           </button>
@@ -70,9 +70,9 @@ export function Sidebar({
                 <Link
                   href={item.href}
                   aria-current={isActive && !activeSubItem ? "page" : undefined}
-                  className={`flex min-h-11 items-center justify-between rounded-[16px] px-4 text-[12px] leading-5 ${
+                  className={`flex min-h-11 items-center justify-between rounded-[var(--radius-action)] px-4 text-[12px] leading-5 ${
                     isActive
-                      ? "bg-[var(--surface-raised)] font-medium shadow-[0_10px_24px_rgba(8,17,32,0.05)]"
+                      ? "bg-[var(--surface-raised)] font-medium shadow-[var(--shadow-surface)]"
                       : "text-[var(--text-muted)]"
                   }`}
                 >
@@ -93,9 +93,9 @@ export function Sidebar({
                           key={subItem.label}
                           href={subItem.href}
                           aria-current={isSubItemActive ? "page" : undefined}
-                          className={`flex min-h-9 items-center justify-between rounded-[14px] px-4 text-[11px] leading-4 transition ${
+                          className={`flex min-h-9 items-center justify-between rounded-[var(--radius-sm)] px-4 text-[11px] leading-4 transition ${
                             isSubItemActive
-                              ? "bg-[rgba(207,217,242,0.72)] font-medium text-[var(--text-primary)]"
+                              ? "bg-[var(--action-selected)] font-medium text-[var(--text-primary)]"
                               : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                           }`}
                         >
@@ -114,7 +114,7 @@ export function Sidebar({
         </nav>
       </div>
 
-      <div className="rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4">
+      <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] p-4">
         <p className="text-[11px] leading-4 text-[var(--text-muted)]">
           Current space
         </p>

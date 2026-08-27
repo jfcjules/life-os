@@ -41,7 +41,7 @@ export function FinancePeriodSelector({
       </p>
 
       <div
-        className="grid rounded-[18px] bg-[var(--background-page)] p-1 max-sm:w-full max-sm:grid-cols-3 sm:inline-grid sm:grid-flow-col"
+        className="grid rounded-[var(--radius-md)] bg-[var(--background-page)] p-1 max-sm:w-full max-sm:grid-cols-3 sm:inline-grid sm:grid-flow-col"
         aria-label="Expense history period"
       >
         {periods.map((periodOption) => {
@@ -53,9 +53,9 @@ export function FinancePeriodSelector({
               type="button"
               aria-pressed={isSelected}
               onClick={() => onChangePeriod(periodOption)}
-              className={`min-h-10 rounded-[14px] px-4 text-[11px] transition ${
+              className={`min-h-10 rounded-[var(--radius-action)] px-4 text-[11px] transition ${
                 isSelected
-                  ? "bg-[var(--surface-raised)] font-medium text-[var(--text-primary)] shadow-[0_10px_24px_rgba(8,17,32,0.05)]"
+                  ? "bg-[var(--surface-raised)] font-medium text-[var(--text-primary)] shadow-[var(--shadow-surface)]"
                   : "text-[var(--text-muted)]"
               }`}
             >

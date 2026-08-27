@@ -97,7 +97,7 @@ export function CalendarWorkspace() {
             <p className="text-[12px] leading-5 text-[var(--text-muted)]">
               Life OS
             </p>
-            <h1 className="mt-3 text-[clamp(2.75rem,7vw,5.5rem)] font-medium leading-[0.96] text-[var(--text-primary)]">
+            <h1 className="mt-3 text-[42px] font-medium leading-[1.05] text-[var(--text-primary)] sm:text-[52px]">
               Calendar
             </h1>
             <p className="mt-5 max-w-[560px] text-[13px] leading-6 text-[var(--text-muted)]">

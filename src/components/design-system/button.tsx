@@ -9,7 +9,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const buttonVariants: Record<ButtonVariant, string> = {
   primary:
-    "bg-[var(--color-action-primary)] text-[var(--text-primary)] shadow-[0_16px_34px_rgba(95,128,212,0.20)]",
+    "bg-[var(--color-action-primary)] text-[var(--text-primary)] shadow-[var(--shadow-action)]",
   secondary:
     "bg-[var(--color-action-secondary)] text-[var(--text-primary)]",
   ghost: "bg-[var(--surface-raised)] text-[var(--text-primary)]",
@@ -24,7 +24,7 @@ export function Button({
   return (
     <button
       type="button"
-      className={`min-h-11 rounded-[14px] px-5 text-[12px] font-medium transition hover:-translate-y-0.5 ${buttonVariants[variant]} ${className}`}
+      className={`min-h-11 rounded-[var(--radius-action)] px-5 text-[12px] font-medium transition hover:-translate-y-0.5 ${buttonVariants[variant]} ${className}`}
       {...props}
     >
       {children}
@@ -45,7 +45,7 @@ export function IconButton({
     <button
       type="button"
       aria-label={label}
-      className={`grid size-11 place-items-center rounded-[14px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] text-xs font-medium text-[var(--text-primary)] shadow-[0_10px_22px_rgba(8,17,32,0.04)] ${className}`}
+      className={`grid size-11 place-items-center rounded-[var(--radius-action)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] text-xs font-medium text-[var(--text-primary)] shadow-[var(--shadow-surface)] ${className}`}
       {...props}
     >
       {children}

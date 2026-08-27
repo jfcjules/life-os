@@ -18,9 +18,9 @@ export function IncomeRow({
 }) {
   return (
     <article
-      className={`grid min-h-[92px] grid-cols-[minmax(0,1fr)_auto] items-start gap-4 rounded-[18px] border p-5 transition max-sm:grid-cols-1 ${
+      className={`grid min-h-[92px] grid-cols-[minmax(0,1fr)_auto] items-start gap-4 rounded-[var(--radius-md)] border p-5 transition max-sm:grid-cols-1 ${
         isSelected
-          ? "border-[rgba(95,128,212,0.42)] bg-[rgba(207,217,242,0.58)]"
+          ? "border-[var(--color-action-primary)] bg-[var(--action-selected)]"
           : "border-[var(--border-subtle)] bg-[var(--surface-raised)]"
       }`}
     >
@@ -35,13 +35,13 @@ export function IncomeRow({
             {income.name}
           </h3>
           {income.label ? (
-            <span className="rounded-full bg-[rgba(126,168,139,0.22)] px-3 py-1 text-[10px] leading-4 text-[var(--text-primary)]">
+            <span className="rounded-full bg-[var(--accent-green-muted)] px-3 py-1 text-[10px] leading-4 text-[var(--text-primary)]">
               {income.label}
             </span>
           ) : null}
           {/*
           {income.category ? (
-            <span className="rounded-full bg-[rgba(227,233,247,0.92)] px-3 py-1 text-[10px] leading-4 text-[var(--text-muted)]">
+            <span className="rounded-full bg-[var(--surface-content)] px-3 py-1 text-[10px] leading-4 text-[var(--text-muted)]">
               {income.category}
             </span>
           ) : null}

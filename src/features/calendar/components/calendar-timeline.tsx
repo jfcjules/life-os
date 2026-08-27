@@ -23,7 +23,7 @@ export function CalendarTimeline({
           ))}
         </div>
       ) : (
-        <div className="mt-5 rounded-[18px] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5">
+        <div className="mt-5 rounded-[var(--radius-md)] border border-dashed border-[var(--border-subtle)] bg-[var(--surface-raised)] p-5">
           <p className="text-[13px] font-medium leading-5">
             No events here yet.
           </p>

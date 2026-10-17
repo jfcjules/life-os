@@ -9,10 +9,11 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const buttonVariants: Record<ButtonVariant, string> = {
   primary:
-    "bg-[var(--color-action-primary)] text-[var(--text-primary)] shadow-[var(--shadow-action)]",
+    "bg-[var(--color-action-primary)] text-[var(--text-on-action-primary)] shadow-[var(--shadow-action)]",
   secondary:
-    "bg-[var(--color-action-secondary)] text-[var(--text-primary)]",
-  ghost: "bg-[var(--surface-raised)] text-[var(--text-primary)]",
+    "border border-[var(--border-subtle)] bg-[var(--color-action-secondary)] text-[var(--text-primary)]",
+  ghost:
+    "border border-transparent bg-transparent text-[var(--text-primary)] hover:bg-[var(--surface-subtle)]",
 };
 
 export function Button({

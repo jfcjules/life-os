@@ -194,7 +194,7 @@ export function QuickAddModal({
               key={step}
               className={`rounded-full px-3 py-2 text-[10px] leading-3 ${
                 step === activeStep
-                  ? "bg-[var(--color-action-primary)] text-[var(--text-primary)]"
+                  ? "bg-[var(--color-action-primary)] text-[var(--text-on-action-primary)]"
                   : "bg-[var(--surface-raised)] text-[var(--text-muted)]"
               }`}
             >

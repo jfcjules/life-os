@@ -120,6 +120,7 @@ export function FinanceWorkspace({
 }: {
   activeSection?: FinanceSection;
 }) {
+  const usesEditorialHeading = activeSection === "Overview";
   const today = useMemo(() => new Date(), []);
   const seedExpenses = useMemo(() => createSeedExpenses(today), [today]);
   const seedIncome = useMemo(() => createSeedIncome(), []);
@@ -662,10 +663,25 @@ export function FinanceWorkspace({
       <div className="flex min-h-full flex-col gap-6">
         <header className="flex items-start justify-between gap-6 max-md:flex-col">
           <div className="max-w-[700px]">
-            <h1 className="text-[42px] font-medium leading-[1.05] text-[var(--text-primary)] sm:text-[52px]">
+            {usesEditorialHeading ? (
+              <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-muted)]">
+                Finance
+              </p>
+            ) : null}
+            <h1
+              className={`font-[family-name:var(--font-display)] font-medium text-[var(--text-primary)] ${
+                usesEditorialHeading
+                  ? "mt-3 font-[family-name:var(--font-display)] text-[48px] leading-[0.98] sm:text-[60px]"
+                  : "text-[42px] leading-[1.05] sm:text-[52px]"
+              }`}
+            >
               {sectionMeta.title}
             </h1>
-            <p className="mt-3 max-w-[420px] text-[13px] leading-6 text-[var(--text-muted)]">
+            <p
+              className={`${
+                usesEditorialHeading ? "mt-4" : "mt-3"
+              } max-w-[420px] text-[13px] leading-6 text-[var(--text-muted)]`}
+            >
               {sectionMeta.description}
             </p>
           </div>

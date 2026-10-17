@@ -1,24 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #e9ecf2;
-  --foreground: #081120;
+  --background: #f8f9fc;
+  --foreground: #091225;
+  --font-display: Georgia, "Times New Roman", serif;
 
-  --color-action-primary: #5f80d4;
-  --color-action-secondary: #cfd9f2;
+  --background-page: #f8f9fc;
+  --surface-raised: #ffffff;
+  --surface-content: #ffffff;
+  --surface-focal: #e6edf9;
+  --surface-subtle: #f1f4f8;
 
-  --background-page: #e9ecf2;
-  --surface-content: #e3e9f7;
-  --surface-raised: #f1f4fa;
+  --color-action-primary: #466ac5;
+  --color-action-secondary: var(--surface-subtle);
+  --text-on-action-primary: #ffffff;
 
-  --text-primary: #081120;
-  --text-muted: #2d3542;
-  --border-subtle: #c8d0df;
+  --text-primary: #091225;
+  --text-muted: #566378;
+  --border-subtle: #d6dde8;
 
-  --accent-green: #7ea88b;
-  --accent-lilac: #a594c7;
-  --accent-rose: #d69ba8;
-  --accent-amber: #d5b276;
+  --color-semantic-income: #4d8063;
+  --color-semantic-expense: #a25f71;
+  --color-semantic-attention: #94612c;
+  --color-semantic-context: #6f5b9a;
+  --accent-green: var(--color-semantic-income);
+  --accent-lilac: var(--color-semantic-context);
+  --accent-rose: var(--color-semantic-expense);
+  --accent-amber: var(--color-semantic-attention);
 
   --radius-sm: 12px;
   --radius-action: 14px;
@@ -26,20 +34,20 @@
   --radius-lg: 28px;
   --radius-shell: 34px;
 
-  --shadow-shell: 0 24px 35px rgba(8, 17, 32, 0.1);
-  --shadow-action: 0 16px 34px rgba(95, 128, 212, 0.24);
-  --shadow-surface: 0 10px 24px rgba(8, 17, 32, 0.05);
-  --shadow-dialog: 0 24px 70px rgba(8, 17, 32, 0.16);
+  --shadow-shell: 0 24px 35px rgba(9, 18, 37, 0.08);
+  --shadow-action: 0 12px 24px rgba(70, 106, 197, 0.22);
+  --shadow-surface: 0 8px 20px rgba(9, 18, 37, 0.05);
+  --shadow-dialog: 0 24px 70px rgba(9, 18, 37, 0.16);
 
-  --overlay-scrim: rgba(8, 17, 32, 0.32);
-  --action-selected: rgba(207, 217, 242, 0.72);
-  --action-hover-border: rgba(95, 128, 212, 0.34);
-  --placeholder-muted: rgba(45, 53, 66, 0.62);
-  --surface-content-muted: rgba(227, 233, 247, 0.68);
-  --accent-green-muted: rgba(126, 168, 139, 0.28);
-  --accent-lilac-muted: rgba(165, 148, 199, 0.28);
-  --accent-rose-muted: rgba(214, 155, 168, 0.28);
-  --accent-amber-muted: rgba(213, 178, 118, 0.3);
+  --overlay-scrim: rgba(9, 18, 37, 0.32);
+  --action-selected: #f1f4f8;
+  --action-hover-border: rgba(70, 106, 197, 0.38);
+  --placeholder-muted: rgba(86, 99, 120, 0.62);
+  --surface-content-muted: #f1f4f8;
+  --accent-green-muted: rgba(77, 128, 99, 0.16);
+  --accent-lilac-muted: rgba(111, 91, 154, 0.14);
+  --accent-rose-muted: rgba(162, 95, 113, 0.14);
+  --accent-amber-muted: rgba(148, 97, 44, 0.14);
 }
 
 @theme inline {

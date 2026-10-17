@@ -35,7 +35,7 @@ function MobileNavigation({
     <div className="hidden min-w-0 border-b border-[var(--border-subtle)] bg-[var(--surface-content)] px-5 py-4 max-lg:block max-sm:px-4">
       <div className="flex min-w-0 items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="grid size-10 place-items-center rounded-[var(--radius-action)] bg-[var(--color-action-primary)] text-[13px] font-medium shadow-[var(--shadow-action)]">
+          <div className="grid size-10 place-items-center rounded-[var(--radius-action)] bg-[var(--color-action-primary)] text-[13px] font-medium text-[var(--text-on-action-primary)] shadow-[var(--shadow-action)]">
             L
           </div>
           <div className="min-w-0">

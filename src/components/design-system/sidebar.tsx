@@ -34,7 +34,7 @@ export function Sidebar({
     <aside className="flex min-h-full flex-col justify-between border-r border-[var(--border-subtle)] bg-[var(--surface-content)] px-[18px] py-[26px] max-lg:hidden">
       <div>
         <div className="flex items-center gap-3 px-1">
-          <div className="grid size-11 place-items-center rounded-[var(--radius-action)] bg-[var(--color-action-primary)] text-sm font-medium shadow-[var(--shadow-action)]">
+          <div className="grid size-11 place-items-center rounded-[var(--radius-action)] bg-[var(--color-action-primary)] text-sm font-medium text-[var(--text-on-action-primary)] shadow-[var(--shadow-action)]">
             L
           </div>
           <div>

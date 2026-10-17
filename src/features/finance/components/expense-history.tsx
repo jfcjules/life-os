@@ -298,7 +298,7 @@ function SortGroup({
               aria-pressed={isSelected}
               className={`min-h-9 rounded-[var(--radius-action)] px-3 text-[10px] transition ${
                 isSelected
-                  ? "bg-[var(--color-action-primary)] font-medium text-[var(--text-primary)] shadow-[var(--shadow-action)]"
+                  ? "bg-[var(--color-action-primary)] font-medium text-[var(--text-on-action-primary)] shadow-[var(--shadow-action)]"
                   : "bg-[var(--surface-raised)] text-[var(--text-muted)]"
               }`}
               onClick={() => onChangeSort(value)}

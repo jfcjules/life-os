@@ -192,9 +192,9 @@ En Next.js, si se usa Google Fonts, el nombre tecnico esperado suele ser `Azeret
 
 ## 3.3 Implementation and validation boundary
 
-- The eventual visual implementation is localized primarily to `src/features/finance/components/expense-form.tsx`. `finance-workspace.tsx`, `expense-history.tsx`, `expense-detail.tsx`, and `confirm-delete-dialog.tsx` are regression-check targets, not redesign targets for FIN-02.
-- Validate desktop, intermediate, and compact layouts, retaining visible focus, sufficient contrast, and keyboard navigation.
-- Run `npm run lint` and `npm run build` when implementing the change.
+- This FIN-02 record governs the existing `ExpenseForm` composition only. The approved Expenses workspace redesign is recorded in [Finance Expenses Redesign](finance/expenses.md) and may update `finance-workspace.tsx`, `expense-history.tsx`, `expense-row.tsx`, and `expense-detail.tsx` without changing the finance data model or business rules.
+- Validate desktop, intermediate, and compact layouts, retaining visible focus, sufficient contrast, keyboard navigation, existing filter/sort behavior, and deletion confirmation.
+- Run `npm run lint` and `npm run build` when implementing either visual direction.
 
 ---
 

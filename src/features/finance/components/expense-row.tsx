@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 
 import type { Expense, FinanceTag, Goal } from "../types";
-import { formatCurrency, formatShortDate } from "../utils";
+import { formatCurrency } from "../utils";
 
 export function ExpenseRow({
   expense,
   goals,
+  isLast,
   isSelected,
   tags,
   onEdit,
@@ -14,70 +15,79 @@ export function ExpenseRow({
 }: {
   expense: Expense;
   goals: Goal[];
+  isLast: boolean;
   isSelected: boolean;
   tags: FinanceTag[];
   onEdit: () => void;
   onSelect: () => void;
   onRemove: () => void;
 }) {
+  const date = new Date(`${expense.date}T00:00:00`);
   const linkedGoal = goals.find((goal) => goal.id === expense.goalId) ?? null;
   const expenseTags = tags.filter((tag) => expense.tagIds.includes(tag.id));
+  const dateMonth = new Intl.DateTimeFormat("en-US", { month: "short" })
+    .format(date)
+    .replace(".", "");
+  const metadata = [
+    expense.category ?? linkedGoal?.name,
+    expenseTags[0]?.label,
+  ].filter(Boolean);
 
   return (
     <article
-      className={`grid min-h-[58px] grid-cols-[72px_minmax(0,1fr)_auto] items-center gap-4 rounded-[var(--radius-action)] border px-4 py-3 transition max-md:grid-cols-[64px_minmax(0,1fr)] max-md:items-start ${
+      className={`grid grid-cols-[68px_minmax(0,1fr)_auto] items-center gap-4 px-3 py-3 transition max-sm:grid-cols-[54px_minmax(0,1fr)_auto] ${
+        !isLast ? "border-b border-[var(--border-subtle)]" : ""
+      } ${
         isSelected
-          ? "border-[var(--color-action-primary)] bg-[var(--action-selected)]"
-          : "border-[var(--border-subtle)] bg-[var(--surface-raised)]"
+          ? "rounded-[var(--radius-action)] bg-[var(--surface-focal)]"
+          : "hover:bg-[var(--surface-subtle)]"
       }`}
     >
       <button
         type="button"
+        className="border-r border-[var(--border-subtle)] pr-3 text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-action-primary)]"
+        aria-label={`Select ${expense.name}${isSelected ? ", selected" : ""}`}
         onClick={onSelect}
-        className="text-left text-[11px] leading-5 text-[var(--text-muted)]"
-        aria-pressed={isSelected}
       >
-        {formatShortDate(expense.date)}
+        <span className="block text-[21px] font-medium leading-5 text-[var(--text-primary)]">
+          {date.getDate()}
+        </span>
+        <span className="mt-1 block text-[10px] uppercase leading-4 text-[var(--text-muted)]">
+          {dateMonth}
+        </span>
       </button>
 
       <button
         type="button"
+        className="min-w-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-action-primary)]"
+        aria-label={`Select ${expense.name}${isSelected ? ", selected" : ""}`}
         onClick={onSelect}
-        className="min-w-0 text-left"
-        aria-pressed={isSelected}
       >
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <h3 className="min-w-0 text-[13px] font-medium leading-5">
-            {expense.name}
-          </h3>
-          {expenseTags.map((tag) => (
-            <span
-              key={tag.id}
-              className="rounded-full bg-[var(--color-action-secondary)] px-3 py-1 text-[10px] leading-4 text-[var(--text-primary)]"
-            >
-              {tag.label}
-            </span>
-          ))}
-        </div>
-        <p className="mt-1 min-w-0 truncate text-[11px] leading-5 text-[var(--text-muted)]">
-          {[expense.category, linkedGoal?.name].filter(Boolean).join(" - ") ||
-            expense.frequency}
-        </p>
+        <span className="block truncate text-[13px] font-medium leading-5 text-[var(--text-primary)]">
+          {expense.name}
+        </span>
+        <span className="mt-1 block truncate text-[11px] leading-5 text-[var(--text-muted)]">
+          {metadata.join(" · ") || "Uncategorized"}
+        </span>
       </button>
 
-      <div className="flex min-w-0 items-center gap-2 justify-self-end max-md:col-span-2 max-md:w-full max-md:justify-end">
-        <span className="mr-2 text-[16px] font-medium leading-6">
+      <div className="flex items-center gap-2 justify-self-end">
+        {isSelected ? (
+          <>
+            <ExpenseActionButton label={`Edit ${expense.name}`} onClick={onEdit}>
+              <PencilIcon />
+            </ExpenseActionButton>
+            <ExpenseActionButton
+              label={`Remove ${expense.name}`}
+              onClick={onRemove}
+            >
+              <TrashIcon />
+            </ExpenseActionButton>
+          </>
+        ) : null}
+        <span className="min-w-20 text-right text-[16px] font-medium leading-6 text-[var(--text-primary)]">
           {formatCurrency(expense.amount)}
         </span>
-        <ExpenseActionButton label={`Edit ${expense.name}`} onClick={onEdit}>
-          <PencilIcon />
-        </ExpenseActionButton>
-        <ExpenseActionButton
-          label={`Remove ${expense.name}`}
-          onClick={onRemove}
-        >
-          <TrashIcon />
-        </ExpenseActionButton>
       </div>
     </article>
   );
@@ -97,7 +107,7 @@ function ExpenseActionButton({
       type="button"
       aria-label={label}
       title={label}
-      className="grid size-9 shrink-0 place-items-center rounded-[var(--radius-action)] border border-[var(--border-subtle)] bg-[var(--surface-content-muted)] text-[var(--text-primary)] transition hover:border-[var(--color-action-primary)] hover:bg-[var(--surface-content)]"
+      className="grid size-9 shrink-0 place-items-center rounded-[10px] border border-[var(--border-subtle)] bg-[var(--surface-raised)] text-[var(--text-primary)] transition hover:border-[var(--color-action-primary)] hover:bg-[var(--surface-subtle)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-action-primary)]"
       onClick={onClick}
     >
       {children}

@@ -69,6 +69,8 @@ import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 import { ExpenseDetail } from "./expense-detail";
 import { ExpenseForm } from "./expense-form";
 import { ExpenseControls, ExpenseHistory } from "./expense-history";
+import { ExpenseSectionNavigation } from "./expense-section-navigation";
+import { ExpenseSummary } from "./expense-summary";
 import { FinanceOverview } from "./finance-overview";
 import { GoalDetail } from "./goal-detail";
 import { GoalForm } from "./goal-form";
@@ -115,12 +117,24 @@ const financeSectionMeta: Record<
   },
 };
 
+function matchesExpenseFilters(expense: Expense, filters: ExpenseFilters) {
+  const matchesCategory =
+    filters.category === "all" || expense.category === filters.category;
+  const matchesGoal =
+    filters.goalId === "all" || expense.goalId === filters.goalId;
+  const matchesTag =
+    filters.tagId === "all" || expense.tagIds.includes(filters.tagId);
+
+  return matchesCategory && matchesGoal && matchesTag;
+}
+
 export function FinanceWorkspace({
   activeSection = "Overview",
 }: {
   activeSection?: FinanceSection;
 }) {
-  const usesEditorialHeading = activeSection === "Overview";
+  const usesEditorialHeading =
+    activeSection === "Overview" || activeSection === "Expenses";
   const today = useMemo(() => new Date(), []);
   const seedExpenses = useMemo(() => createSeedExpenses(today), [today]);
   const seedIncome = useMemo(() => createSeedIncome(), []);
@@ -151,6 +165,9 @@ export function FinanceWorkspace({
   const [anchorDate, setAnchorDate] = useState(today);
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
     null,
+  );
+  const [expenseView, setExpenseView] = useState<"Summary" | "Details">(
+    "Summary",
   );
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
   const [expenseFilters, setExpenseFilters] = useState<ExpenseFilters>({
@@ -206,6 +223,18 @@ export function FinanceWorkspace({
     );
   }, [expenses, periodRange]);
 
+  const summaryPeriodRange = useMemo(
+    () => getPeriodRange("Monthly", anchorDate),
+    [anchorDate],
+  );
+  const summaryPeriodExpenses = useMemo(() => {
+    return sortByDateDesc(
+      expenses.filter((expense) =>
+        isWithinPeriod(expense.date, summaryPeriodRange),
+      ),
+    );
+  }, [expenses, summaryPeriodRange]);
+
   const expenseCategoryOptions = useMemo(() => {
     return Array.from(
       new Set(
@@ -216,31 +245,34 @@ export function FinanceWorkspace({
     ).sort((first, second) => first.localeCompare(second));
   }, [periodExpenses]);
 
-  const visibleExpenses = useMemo(() => {
-    const filteredExpenses = periodExpenses.filter((expense) => {
-      const matchesCategory =
-        expenseFilters.category === "all" ||
-        expense.category === expenseFilters.category;
-      const matchesGoal =
-        expenseFilters.goalId === "all" ||
-        expense.goalId === expenseFilters.goalId;
-      const matchesTag =
-        expenseFilters.tagId === "all" ||
-        expense.tagIds.includes(expenseFilters.tagId);
+  const summaryCategoryOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        summaryPeriodExpenses
+          .map((expense) => expense.category)
+          .filter((category): category is string => Boolean(category)),
+      ),
+    ).sort((first, second) => first.localeCompare(second));
+  }, [summaryPeriodExpenses]);
 
-      return matchesCategory && matchesGoal && matchesTag;
-    });
+  const visibleExpenses = useMemo(() => {
+    const filteredExpenses = periodExpenses.filter((expense) =>
+      matchesExpenseFilters(expense, expenseFilters),
+    );
 
     return sortExpenses(filteredExpenses, expenseSortOption);
   }, [expenseFilters, expenseSortOption, periodExpenses]);
+  const summaryVisibleExpenses = useMemo(
+    () =>
+      summaryPeriodExpenses.filter((expense) =>
+        matchesExpenseFilters(expense, expenseFilters),
+      ),
+    [expenseFilters, summaryPeriodExpenses],
+  );
 
   const periodTotal = useMemo(
     () => sumExpenses(periodExpenses),
     [periodExpenses],
-  );
-  const visibleExpenseTotal = useMemo(
-    () => sumExpenses(visibleExpenses),
-    [visibleExpenses],
   );
   const periodIncome = useMemo(() => {
     return sortByDateDesc(
@@ -656,6 +688,12 @@ export function FinanceWorkspace({
     );
   }
 
+  function handleMoveSummaryMonth(direction: -1 | 1) {
+    setAnchorDate((currentAnchorDate) =>
+      movePeriod("Monthly", currentAnchorDate, direction),
+    );
+  }
+
   const sectionMeta = financeSectionMeta[activeSection];
 
   return (
@@ -668,15 +706,29 @@ export function FinanceWorkspace({
                 Finance
               </p>
             ) : null}
-            <h1
-              className={`font-[family-name:var(--font-display)] font-medium text-[var(--text-primary)] ${
-                usesEditorialHeading
-                  ? "mt-3 font-[family-name:var(--font-display)] text-[48px] leading-[0.98] sm:text-[60px]"
-                  : "text-[42px] leading-[1.05] sm:text-[52px]"
-              }`}
+            <div
+              className={
+                activeSection === "Expenses"
+                  ? "flex flex-wrap items-center gap-x-6 gap-y-4"
+                  : undefined
+              }
             >
-              {sectionMeta.title}
-            </h1>
+              <h1
+                className={`font-[family-name:var(--font-display)] font-medium text-[var(--text-primary)] ${
+                  usesEditorialHeading
+                    ? "mt-3 font-[family-name:var(--font-display)] text-[48px] leading-[0.98] sm:text-[60px]"
+                    : "text-[42px] leading-[1.05] sm:text-[52px]"
+                }`}
+              >
+                {sectionMeta.title}
+              </h1>
+              {activeSection === "Expenses" ? (
+                <ExpenseSectionNavigation
+                  activeView={expenseView}
+                  onChange={setExpenseView}
+                />
+              ) : null}
+            </div>
             <p
               className={`${
                 usesEditorialHeading ? "mt-4" : "mt-3"
@@ -721,70 +773,75 @@ export function FinanceWorkspace({
         ) : null}
 
         {activeSection === "Expenses" ? (
-          <div className="grid gap-6">
-            <ExpenseControls
-              categoryOptions={expenseCategoryOptions}
-              filters={expenseFilters}
-              goals={goals}
-              period={period}
-              periodOptions={availableExpensePeriodOptions}
-              selectedPeriodOptionId={selectedExpensePeriodOption?.id ?? null}
-              sortOption={expenseSortOption}
-              tags={tags}
-              onChangeFilters={setExpenseFilters}
-              onChangePeriod={handleChangeExpensePeriod}
-              onChangePeriodOption={handleChangeExpensePeriodOption}
-              onChangeSort={setExpenseSortOption}
-            />
+          <div className="grid gap-8">
+            {expenseView === "Summary" ? (
+              <section
+                id="expenses-summary-panel"
+                aria-labelledby="expenses-summary-tab"
+                role="tabpanel"
+              >
+                <ExpenseSummary
+                  categoryOptions={summaryCategoryOptions}
+                  expenses={summaryVisibleExpenses}
+                  filters={expenseFilters}
+                  goals={goals}
+                  month={anchorDate}
+                  tags={tags}
+                  onChangeFilters={setExpenseFilters}
+                  onMoveMonth={handleMoveSummaryMonth}
+                  onSelectExpense={(expenseId) => {
+                    setSelectedExpenseId(expenseId);
+                    setPeriod("Monthly");
+                    setExpenseView("Details");
+                  }}
+                  onViewDetails={() => setExpenseView("Details")}
+                />
+              </section>
+            ) : null}
 
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_424px]">
-              <ExpenseHistory
-                expenses={visibleExpenses}
-                filters={expenseFilters}
-                goals={goals}
-                tags={tags}
-                unfilteredCount={periodExpenses.length}
-                selectedExpenseId={activeSelectedExpenseId}
-                onAddExpense={handleOpenAddExpense}
-                onEditExpense={handleEditExpense}
-                onRemoveExpense={setExpensePendingDelete}
-                onSelectExpense={setSelectedExpenseId}
-              />
+            {expenseView === "Details" ? (
+              <section
+                id="expenses-details-panel"
+                aria-labelledby="expenses-details-tab"
+                role="tabpanel"
+                className="grid gap-6"
+              >
+                <ExpenseControls
+                  categoryOptions={expenseCategoryOptions}
+                  filters={expenseFilters}
+                  goals={goals}
+                  period={period}
+                  periodOptions={availableExpensePeriodOptions}
+                  selectedPeriodOptionId={selectedExpensePeriodOption?.id ?? null}
+                  sortOption={expenseSortOption}
+                  tags={tags}
+                  onChangeFilters={setExpenseFilters}
+                  onChangePeriod={handleChangeExpensePeriod}
+                  onChangePeriodOption={handleChangeExpensePeriodOption}
+                  onChangeSort={setExpenseSortOption}
+                />
 
-              <aside className="min-w-0 space-y-6">
-                <Card>
-                  <p className="text-[12px] leading-5 text-[var(--text-muted)]">
-                    Period spent
-                  </p>
-                  <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
-                    {formatCurrency(visibleExpenseTotal)}
-                  </p>
-                  <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
-                    {visibleExpenses.length} expenses in the selected period
-                  </p>
-                </Card>
+                <ExpenseHistory
+                  expenses={visibleExpenses}
+                  filters={expenseFilters}
+                  goals={goals}
+                  tags={tags}
+                  unfilteredCount={periodExpenses.length}
+                  selectedExpenseId={activeSelectedExpenseId}
+                  onAddExpense={handleOpenAddExpense}
+                  onEditExpense={handleEditExpense}
+                  onRemoveExpense={setExpensePendingDelete}
+                  onSelectExpense={setSelectedExpenseId}
+                />
 
-                <ExpenseDetail expense={selectedExpense} tags={tags} />
-
-                <Card>
-                  <p className="text-[12px] font-medium leading-5">
-                    Quick action
-                  </p>
-                  <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
-                    Keep the entry small and specific.
-                  </p>
-                  <div className="mt-5">
-                    <Button
-                      variant="secondary"
-                      className="w-full"
-                      onClick={handleOpenAddExpense}
-                    >
-                      Add expense
-                    </Button>
-                  </div>
-                </Card>
-              </aside>
-            </div>
+                <ExpenseDetail
+                  budgets={budgets}
+                  expense={selectedExpense}
+                  goals={goals}
+                  tags={tags}
+                />
+              </section>
+            ) : null}
           </div>
         ) : null}
 

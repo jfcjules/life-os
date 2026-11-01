@@ -9,6 +9,7 @@ import type {
   GoalPlannedItem,
   GoalSaving,
   Income,
+  IncomeSortOption,
 } from "./types";
 
 export type PeriodRange = {
@@ -344,10 +345,17 @@ export function getAvailableExpensePeriodOptions(
   expenses: Expense[],
   period: FinancePeriod,
 ): FinancePeriodOption[] {
+  return getAvailablePeriodOptions(expenses, period);
+}
+
+export function getAvailablePeriodOptions<T extends { date: string }>(
+  items: T[],
+  period: FinancePeriod,
+): FinancePeriodOption[] {
   const periodOptions = new Map<string, FinancePeriodOption>();
 
-  for (const expense of expenses) {
-    const range = getPeriodRange(period, new Date(`${expense.date}T00:00:00`));
+  for (const item of items) {
+    const range = getPeriodRange(period, new Date(`${item.date}T00:00:00`));
     const id = `${formatDateInput(range.start)}:${formatDateInput(range.end)}`;
 
     if (!periodOptions.has(id)) {
@@ -413,7 +421,18 @@ export function sortExpenses(
   expenses: Expense[],
   sortOption: ExpenseSortOption,
 ) {
-  return [...expenses].sort((first, second) => {
+  return sortFinanceRecords(expenses, sortOption);
+}
+
+export function sortIncome(income: Income[], sortOption: IncomeSortOption) {
+  return sortFinanceRecords(income, sortOption);
+}
+
+function sortFinanceRecords<T extends { amount: number; date: string }>(
+  records: T[],
+  sortOption: ExpenseSortOption | IncomeSortOption,
+) {
+  return [...records].sort((first, second) => {
     if (sortOption === "amount-highest") {
       return second.amount - first.amount;
     }

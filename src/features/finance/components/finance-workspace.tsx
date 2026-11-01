@@ -22,6 +22,7 @@ import {
   formatDateRange,
   formatDateInput,
   getAvailableExpensePeriodOptions,
+  getAvailablePeriodOptions,
   getBudgetConcepts,
   getGoalPlannedItems,
   getPeriodRange,
@@ -29,6 +30,7 @@ import {
   movePeriod,
   sortByDateDesc,
   sortExpenses,
+  sortIncome,
   calculateNetSavings,
   sumBudgetSpentAmount,
   sumBudgetsSpentAmount,
@@ -60,6 +62,8 @@ import type {
   GoalPlannedItem,
   GoalSaving,
   Income,
+  IncomeFilters,
+  IncomeSortOption,
 } from "../types";
 import { BudgetDetail } from "./budget-detail";
 import { BudgetForm } from "./budget-form";
@@ -79,7 +83,9 @@ import { GoalPlannedItemForm } from "./goal-planned-item-form";
 import { GoalSavingForm } from "./goal-saving-form";
 import { IncomeDetail } from "./income-detail";
 import { IncomeForm } from "./income-form";
-import { IncomeHistory } from "./income-history";
+import { IncomeControls, IncomeHistory } from "./income-history";
+import { IncomeSectionNavigation } from "./income-section-navigation";
+import { IncomeSummary } from "./income-summary";
 
 export type FinanceSection =
   | "Overview"
@@ -128,13 +134,26 @@ function matchesExpenseFilters(expense: Expense, filters: ExpenseFilters) {
   return matchesCategory && matchesGoal && matchesTag;
 }
 
+function matchesIncomeFilters(incomeItem: Income, filters: IncomeFilters) {
+  const matchesCategory =
+    filters.category === "all" || incomeItem.category === filters.category;
+  const matchesLabel =
+    filters.label === "all" || incomeItem.label === filters.label;
+  const matchesFrequency =
+    filters.frequency === "all" || incomeItem.frequency === filters.frequency;
+
+  return matchesCategory && matchesLabel && matchesFrequency;
+}
+
 export function FinanceWorkspace({
   activeSection = "Overview",
 }: {
   activeSection?: FinanceSection;
 }) {
   const usesEditorialHeading =
-    activeSection === "Overview" || activeSection === "Expenses";
+    activeSection === "Overview" ||
+    activeSection === "Expenses" ||
+    activeSection === "Income";
   const today = useMemo(() => new Date(), []);
   const seedExpenses = useMemo(() => createSeedExpenses(today), [today]);
   const seedIncome = useMemo(() => createSeedIncome(), []);
@@ -169,6 +188,9 @@ export function FinanceWorkspace({
   const [expenseView, setExpenseView] = useState<"Summary" | "Details">(
     "Summary",
   );
+  const [incomeView, setIncomeView] = useState<"Summary" | "Details">(
+    "Summary",
+  );
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
   const [expenseFilters, setExpenseFilters] = useState<ExpenseFilters>({
     category: "all",
@@ -177,6 +199,13 @@ export function FinanceWorkspace({
   });
   const [expenseSortOption, setExpenseSortOption] =
     useState<ExpenseSortOption>("date-newest");
+  const [incomeFilters, setIncomeFilters] = useState<IncomeFilters>({
+    category: "all",
+    label: "all",
+    frequency: "all",
+  });
+  const [incomeSortOption, setIncomeSortOption] =
+    useState<IncomeSortOption>("date-newest");
   const [selectedIncomeId, setSelectedIncomeId] = useState<string | null>(null);
   const [editingIncomeId, setEditingIncomeId] = useState<string | null>(null);
   const [selectedBudgetId, setSelectedBudgetId] = useState<string | null>(null);
@@ -189,6 +218,10 @@ export function FinanceWorkspace({
   const availableExpensePeriodOptions = useMemo(
     () => getAvailableExpensePeriodOptions(expenses, period),
     [expenses, period],
+  );
+  const availableIncomePeriodOptions = useMemo(
+    () => getAvailablePeriodOptions(income, period),
+    [income, period],
   );
   const currentExpensePeriodOptionId = useMemo(() => {
     const range = getPeriodRange(period, anchorDate);
@@ -204,9 +237,25 @@ export function FinanceWorkspace({
       null,
     [availableExpensePeriodOptions, currentExpensePeriodOptionId],
   );
+  const currentIncomePeriodOptionId = useMemo(() => {
+    const range = getPeriodRange(period, anchorDate);
+
+    return `${formatDateInput(range.start)}:${formatDateInput(range.end)}`;
+  }, [anchorDate, period]);
+  const selectedIncomePeriodOption = useMemo(
+    () =>
+      availableIncomePeriodOptions.find(
+        (option) => option.id === currentIncomePeriodOptionId,
+      ) ??
+      availableIncomePeriodOptions[0] ??
+      null,
+    [availableIncomePeriodOptions, currentIncomePeriodOptionId],
+  );
   const effectiveAnchorDate =
     activeSection === "Expenses" && selectedExpensePeriodOption
       ? selectedExpensePeriodOption.anchorDate
+      : activeSection === "Income" && selectedIncomePeriodOption
+        ? selectedIncomePeriodOption.anchorDate
       : anchorDate;
   const periodRange = useMemo(
     () => getPeriodRange(period, effectiveAnchorDate),
@@ -234,6 +283,13 @@ export function FinanceWorkspace({
       ),
     );
   }, [expenses, summaryPeriodRange]);
+  const summaryPeriodIncome = useMemo(() => {
+    return sortByDateDesc(
+      income.filter((incomeItem) =>
+        isWithinPeriod(incomeItem.date, summaryPeriodRange),
+      ),
+    );
+  }, [income, summaryPeriodRange]);
 
   const expenseCategoryOptions = useMemo(() => {
     return Array.from(
@@ -254,6 +310,36 @@ export function FinanceWorkspace({
       ),
     ).sort((first, second) => first.localeCompare(second));
   }, [summaryPeriodExpenses]);
+  const summaryIncomeCategoryOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        summaryPeriodIncome
+          .map((incomeItem) => incomeItem.category)
+          .filter((category): category is string => Boolean(category)),
+      ),
+    ).sort((first, second) => first.localeCompare(second));
+  }, [summaryPeriodIncome]);
+  const summaryIncomeLabelOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        summaryPeriodIncome
+          .map((incomeItem) => incomeItem.label)
+          .filter((label): label is string => Boolean(label)),
+      ),
+    ).sort((first, second) => first.localeCompare(second));
+  }, [summaryPeriodIncome]);
+  const summaryIncomeFrequencyOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        summaryPeriodIncome
+          .map((incomeItem) => incomeItem.frequency)
+          .filter(
+            (frequency): frequency is NonNullable<Income["frequency"]> =>
+              Boolean(frequency),
+          ),
+      ),
+    ).sort((first, second) => first.localeCompare(second));
+  }, [summaryPeriodIncome]);
 
   const visibleExpenses = useMemo(() => {
     const filteredExpenses = periodExpenses.filter((expense) =>
@@ -269,6 +355,10 @@ export function FinanceWorkspace({
       ),
     [expenseFilters, summaryPeriodExpenses],
   );
+  const summaryVisibleIncome = useMemo(
+    () => summaryPeriodIncome.filter((incomeItem) => matchesIncomeFilters(incomeItem, incomeFilters)),
+    [incomeFilters, summaryPeriodIncome],
+  );
 
   const periodTotal = useMemo(
     () => sumExpenses(periodExpenses),
@@ -279,6 +369,43 @@ export function FinanceWorkspace({
       income.filter((incomeItem) => isWithinPeriod(incomeItem.date, periodRange)),
     );
   }, [income, periodRange]);
+  const incomeCategoryOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        periodIncome
+          .map((incomeItem) => incomeItem.category)
+          .filter((category): category is string => Boolean(category)),
+      ),
+    ).sort((first, second) => first.localeCompare(second));
+  }, [periodIncome]);
+  const incomeLabelOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        periodIncome
+          .map((incomeItem) => incomeItem.label)
+          .filter((label): label is string => Boolean(label)),
+      ),
+    ).sort((first, second) => first.localeCompare(second));
+  }, [periodIncome]);
+  const incomeFrequencyOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        periodIncome
+          .map((incomeItem) => incomeItem.frequency)
+          .filter(
+            (frequency): frequency is NonNullable<Income["frequency"]> =>
+              Boolean(frequency),
+          ),
+      ),
+    ).sort((first, second) => first.localeCompare(second));
+  }, [periodIncome]);
+  const visibleIncome = useMemo(() => {
+    const filteredIncome = periodIncome.filter((incomeItem) =>
+      matchesIncomeFilters(incomeItem, incomeFilters),
+    );
+
+    return sortIncome(filteredIncome, incomeSortOption);
+  }, [incomeFilters, incomeSortOption, periodIncome]);
   const periodIncomeTotal = useMemo(
     () => sumIncome(periodIncome),
     [periodIncome],
@@ -304,10 +431,10 @@ export function FinanceWorkspace({
   );
   const selectedIncome = useMemo(
     () =>
-      periodIncome.find((incomeItem) => incomeItem.id === selectedIncomeId) ??
-      periodIncome[0] ??
+      visibleIncome.find((incomeItem) => incomeItem.id === selectedIncomeId) ??
+      visibleIncome[0] ??
       null,
-    [periodIncome, selectedIncomeId],
+    [selectedIncomeId, visibleIncome],
   );
   const activeSelectedIncomeId = selectedIncome?.id ?? null;
   const editingIncome = useMemo(
@@ -682,6 +809,29 @@ export function FinanceWorkspace({
     }
   }
 
+  function handleChangeIncomePeriod(nextPeriod: FinancePeriod) {
+    const [firstAvailablePeriodOption] = getAvailablePeriodOptions(
+      income,
+      nextPeriod,
+    );
+
+    setPeriod(nextPeriod);
+
+    if (firstAvailablePeriodOption) {
+      setAnchorDate(firstAvailablePeriodOption.anchorDate);
+    }
+  }
+
+  function handleChangeIncomePeriodOption(periodOptionId: string) {
+    const periodOption = availableIncomePeriodOptions.find(
+      (option) => option.id === periodOptionId,
+    );
+
+    if (periodOption) {
+      setAnchorDate(periodOption.anchorDate);
+    }
+  }
+
   function handleMovePeriod(direction: -1 | 1) {
     setAnchorDate((currentAnchorDate) =>
       movePeriod(period, currentAnchorDate, direction),
@@ -708,7 +858,7 @@ export function FinanceWorkspace({
             ) : null}
             <div
               className={
-                activeSection === "Expenses"
+                activeSection === "Expenses" || activeSection === "Income"
                   ? "flex flex-wrap items-center gap-x-6 gap-y-4"
                   : undefined
               }
@@ -726,6 +876,12 @@ export function FinanceWorkspace({
                 <ExpenseSectionNavigation
                   activeView={expenseView}
                   onChange={setExpenseView}
+                />
+              ) : null}
+              {activeSection === "Income" ? (
+                <IncomeSectionNavigation
+                  activeView={incomeView}
+                  onChange={setIncomeView}
                 />
               ) : null}
             </div>
@@ -846,66 +1002,68 @@ export function FinanceWorkspace({
         ) : null}
 
         {activeSection === "Income" ? (
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
-            <IncomeHistory
-              income={periodIncome}
-              period={period}
-              rangeLabel={periodRangeLabel}
-              total={periodIncomeTotal}
-              selectedIncomeId={activeSelectedIncomeId}
-              onAddIncome={handleOpenAddIncome}
-              onChangePeriod={handleChangePeriod}
-              onEditIncome={handleEditIncome}
-              onMovePeriod={handleMovePeriod}
-              onRemoveIncome={setIncomePendingDelete}
-              onSelectIncome={setSelectedIncomeId}
-            />
+          <div className="grid gap-8">
+            {incomeView === "Summary" ? (
+              <section
+                id="income-summary-panel"
+                aria-labelledby="income-summary-tab"
+                role="tabpanel"
+              >
+                <IncomeSummary
+                  categoryOptions={summaryIncomeCategoryOptions}
+                  filters={incomeFilters}
+                  frequencyOptions={summaryIncomeFrequencyOptions}
+                  income={summaryVisibleIncome}
+                  labelOptions={summaryIncomeLabelOptions}
+                  month={anchorDate}
+                  onChangeFilters={setIncomeFilters}
+                  onMoveMonth={handleMoveSummaryMonth}
+                  onSelectIncome={(incomeId) => {
+                    setSelectedIncomeId(incomeId);
+                    setPeriod("Monthly");
+                    setIncomeView("Details");
+                  }}
+                  onViewDetails={() => setIncomeView("Details")}
+                />
+              </section>
+            ) : null}
 
-            <aside className="min-w-0 space-y-6">
-              <Card>
-                <p className="text-[12px] leading-5 text-[var(--text-muted)]">
-                  Period income
-                </p>
-                <p className="mt-3 text-[32px] font-medium leading-10 text-[var(--text-primary)]">
-                  {formatCurrency(periodIncomeTotal)}
-                </p>
-                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
-                  {periodIncome.length} income entries in the selected period
-                </p>
-              </Card>
+            {incomeView === "Details" ? (
+              <section
+                id="income-details-panel"
+                aria-labelledby="income-details-tab"
+                role="tabpanel"
+                className="grid gap-6"
+              >
+                <IncomeControls
+                  categoryOptions={incomeCategoryOptions}
+                  filters={incomeFilters}
+                  frequencyOptions={incomeFrequencyOptions}
+                  labelOptions={incomeLabelOptions}
+                  period={period}
+                  periodOptions={availableIncomePeriodOptions}
+                  selectedPeriodOptionId={selectedIncomePeriodOption?.id ?? null}
+                  sortOption={incomeSortOption}
+                  onChangeFilters={setIncomeFilters}
+                  onChangePeriod={handleChangeIncomePeriod}
+                  onChangePeriodOption={handleChangeIncomePeriodOption}
+                  onChangeSort={setIncomeSortOption}
+                />
 
-              <IncomeDetail
-                income={selectedIncome}
-                onEdit={() => {
-                  if (selectedIncome) {
-                    handleEditIncome(selectedIncome);
-                  }
-                }}
-                onRemove={() => {
-                  if (selectedIncome) {
-                    setIncomePendingDelete(selectedIncome);
-                  }
-                }}
-              />
+                <IncomeHistory
+                  income={visibleIncome}
+                  filters={incomeFilters}
+                  unfilteredCount={periodIncome.length}
+                  selectedIncomeId={activeSelectedIncomeId}
+                  onAddIncome={handleOpenAddIncome}
+                  onEditIncome={handleEditIncome}
+                  onRemoveIncome={setIncomePendingDelete}
+                  onSelectIncome={setSelectedIncomeId}
+                />
 
-              <Card>
-                <p className="text-[12px] font-medium leading-5">
-                  Quick action
-                </p>
-                <p className="mt-3 text-[11px] leading-5 text-[var(--text-muted)]">
-                  Capture income when money arrives.
-                </p>
-                <div className="mt-5">
-                  <Button
-                    variant="secondary"
-                    className="w-full"
-                    onClick={handleOpenAddIncome}
-                  >
-                    Add income
-                  </Button>
-                </div>
-              </Card>
-            </aside>
+                <IncomeDetail income={selectedIncome} />
+              </section>
+            ) : null}
           </div>
         ) : null}
 

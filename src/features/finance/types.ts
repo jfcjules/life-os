@@ -18,6 +18,18 @@ export type ExpenseFilters = {
   tagId: string;
 };
 
+export type IncomeSortOption =
+  | "amount-highest"
+  | "amount-lowest"
+  | "date-newest"
+  | "date-oldest";
+
+export type IncomeFilters = {
+  category: string;
+  label: string;
+  frequency: string;
+};
+
 export type FinanceUser = {
   id: string;
   name: string;

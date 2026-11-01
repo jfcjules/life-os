@@ -3,18 +3,18 @@ import { useMemo, useState } from "react";
 
 import { Button } from "@/components/design-system";
 
-import type { Income } from "../types";
+import type { FinanceFrequency, Income } from "../types";
 import { createFinanceId, formatDateInput } from "../utils";
 
 const fieldClass =
   "min-h-11 w-full rounded-[var(--radius-action)] border border-[var(--border-subtle)] bg-[var(--surface-raised)] px-4 text-[12px] text-[var(--text-primary)] outline-none transition focus:border-[var(--color-action-primary)]";
 
-// const frequencyOptions: FinanceFrequency[] = [
-//   "One-time",
-//   "Weekly",
-//   "Monthly",
-//   "Yearly",
-// ];
+const frequencyOptions: FinanceFrequency[] = [
+  "One-time",
+  "Weekly",
+  "Monthly",
+  "Yearly",
+];
 
 export function IncomeForm({
   income,
@@ -33,11 +33,11 @@ export function IncomeForm({
     income ? String(income.amount) : "",
   );
   const [date, setDate] = useState(income?.date ?? defaultDate);
-  // const [category, setCategory] = useState(income?.category ?? "");
+  const [category, setCategory] = useState(income?.category ?? "");
   const [label, setLabel] = useState(income?.label ?? "");
-  // const [frequency, setFrequency] = useState<FinanceFrequency | "">(
-  //   income?.frequency ?? "",
-  // );
+  const [frequency, setFrequency] = useState<FinanceFrequency | "">(
+    income?.frequency ?? "",
+  );
   const [error, setError] = useState("");
   const isEditing = Boolean(income);
 
@@ -61,10 +61,8 @@ export function IncomeForm({
       name: name.trim(),
       amount: parsedAmount,
       date,
-      // category: category.trim() || undefined,
-      category: income?.category,
-      // frequency: frequency || undefined,
-      frequency: income?.frequency,
+      category: category.trim() || undefined,
+      frequency: frequency || undefined,
       label: label.trim() || undefined,
       tagIds: income?.tagIds ?? [],
     });
@@ -137,7 +135,6 @@ export function IncomeForm({
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/*
             <label className="grid gap-2 text-[11px] leading-4 text-[var(--text-muted)]">
               Category
               <input
@@ -146,7 +143,6 @@ export function IncomeForm({
                 onChange={(event) => setCategory(event.target.value)}
               />
             </label>
-            */}
 
             <label className="grid gap-2 text-[11px] leading-4 text-[var(--text-muted)]">
               Label
@@ -158,7 +154,6 @@ export function IncomeForm({
             </label>
           </div>
 
-          {/*
           <label className="grid gap-2 text-[11px] leading-4 text-[var(--text-muted)]">
             Frequency
             <select
@@ -176,7 +171,6 @@ export function IncomeForm({
               ))}
             </select>
           </label>
-          */}
         </div>
 
         {error ? (

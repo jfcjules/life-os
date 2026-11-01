@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Sidebar, primaryNavigation } from "./sidebar";
+import { primaryNavigation } from "./navigation";
+import { Sidebar } from "./sidebar";
 
 export function AppShell({
   children,
@@ -13,10 +14,10 @@ export function AppShell({
 }) {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[var(--background-page)] text-[var(--text-primary)]">
-      <div className="grid min-h-screen w-full grid-cols-1 bg-[var(--background-page)] lg:grid-cols-[260px_minmax(0,1fr)]">
+      <div className="min-h-screen w-full bg-[var(--background-page)] lg:flex">
         <Sidebar activeItem={activeItem} activeSubItem={activeSubItem} />
         <MobileNavigation activeItem={activeItem} activeSubItem={activeSubItem} />
-        <section className="min-w-0 overflow-x-hidden px-8 py-8 max-sm:px-4">
+        <section className="min-w-0 overflow-x-hidden px-8 py-8 max-sm:px-4 lg:flex-1">
           {children}
         </section>
       </div>

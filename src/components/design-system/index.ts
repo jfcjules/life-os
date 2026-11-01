@@ -5,5 +5,6 @@ export { EmptyWorkspace } from "./empty-workspace";
 export { ListRow, PreviewCard } from "./list-row";
 export { QuickActionTile, QuickAddModal, quickAddActions } from "./quick-add";
 export { SectionHeader } from "./section-header";
-export { Sidebar, primaryNavigation } from "./sidebar";
+export { Sidebar } from "./sidebar";
+export { primaryNavigation } from "./navigation";
 export type { NavigationItem, QuickAddAction, QuickAddType } from "./types";
